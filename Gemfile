@@ -1,17 +1,17 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 #source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 3.1.11'
+gem 'rails', '~> 3.2.15'
 
 gem 'rake'
 gem 'google-spreadsheet-ruby'
-gem 'pg', '~> 0.11.0'
+gem 'pg', '~> 0.17.0'
 gem 'jquery-rails'
 gem 'cancan', '~> 1.6.7'
 gem 'rest-client', '~> 1.6.7'
 gem 'daemons', '~> 1.1.4'
-gem 'pg_comment', '~> 0.1.1'
+gem 'pg_comment', '~> 0.2.1'
 gem 'natcmp', '~> 1.4'
 gem 'fastercsv', :platforms => :ruby_18
 gem 'foreigner', '~> 1.1.6'
