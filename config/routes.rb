@@ -71,7 +71,9 @@ TmcServer::Application.routes.draw do
 
   resources :feedback_answers, :only => [:show]
 
-  resources :student_events, :only => [:create]
+  # extractng this to another rack app
+  #  resources :student_events, :only => [:create]
+  mount StudentEventsRecorderApp.new => "student_events"
 
   resource :page_presence, :only => [:update]
 
