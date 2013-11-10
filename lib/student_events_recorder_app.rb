@@ -1,7 +1,7 @@
 require 'pg'
 require 'yaml'
 require 'erb'
-
+require 'base64'
 
 class StudentEventsRecorderApp
 
@@ -158,15 +158,28 @@ class StudentEventsRecorderApp
     end
   end
 
-  # TODO: implement real functionality!!!
   def get_user_id(http_basic_auth)
-    # we probably should auth and get our user_id
-    return 2
+    puts "getting user id"
+    puts http_basic_auth
+    username, password =  Base64.decode64(http_basic_auth).split(":")
+    puts username
+    puts password
+    user = User.authenticate(username, password)
+    puts "got user #{user}"
+    if user
+      user.id
+    else
+      raise InvalidUser
+    end
   end
-  # TODO: implement
+
+  def fix_data(data)
+    @conn.escape_bytea(data)
+  end
+
   def save_event(event)
     puts "saving_event"
-    result = @conn.exec('INSERT INTO student_events (course_id, data, event_type, exercise_name, happened_at, metadata_json, system_nano_time, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',   [ event[:course_id], event[:data], event[:event_type], event[:exercise_name], event[:happened_at], event[:metadata_json], event[:system_nano_time], event[:user_id]])
+    result = @conn.exec('INSERT INTO student_events (course_id, data, event_type, exercise_name, happened_at, metadata_json, system_nano_time, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',   [ event[:course_id], fix_data(event[:data]), event[:event_type], event[:exercise_name], event[:happened_at], event[:metadata_json], event[:system_nano_time], event[:user_id]])
     puts "saved #{result}"
     puts
   end
@@ -174,3 +187,4 @@ end
 
 class BadRequest < StandardError; end
 class InvalidSqlReguest < StandardError; end
+class InvalidUser < StandardError; end
