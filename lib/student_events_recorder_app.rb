@@ -6,15 +6,15 @@ require 'erb'
 class StudentEventsRecorderApp
 
   def initialize
-    db_name, password = get_db_connection_info_from_rails
-    @conn = PG.connect(dbname: db_name, password: password)
+    db_name, password, user = get_db_connection_info_from_rails
+    @conn = PG::Connection.open(dbname: db_name, password: password, user: user)
   end
 
   def get_db_connection_info_from_rails
     root_dir = File.expand_path('../', File.dirname(__FILE__))
     db_config = YAML.load(ERB.new(File.read(root_dir + '/config/database.yml')).result)
     env = db_config[Rails.env]
-    return env['database'], env['password']
+    return env['database'], env['password'], env['username']
   end
 
   def call(env)
@@ -140,26 +140,37 @@ class StudentEventsRecorderApp
     end
   end
 
-  def get_exercise_name_within_course(course, ex_name)
-    @conn.exec("SELECT exercises.name FROM exercises WHERE exercises.course_id = $1 AND exercises.name = $2 LIMIT 1", [1, 'viikko3-3.1.Polynomi']).first['name']
+  def get_exercise_name_within_course(course_id, ex_name)
+    result = @conn.exec("SELECT exercises.name FROM exercises WHERE exercises.course_id = $1 AND exercises.name = $2 LIMIT 1", [course_id, ex_name]).first
+    if result
+      result['name']
+    else
+      raise InvalidSqlReguest
+    end
   end
 
   def get_course_id(course_name)
-    @conn.exec('SELECT courses.id FROM courses WHERE courses.name = $1 LIMIT 1', [course_name]).first['id']
+    result = @conn.exec('SELECT courses.id FROM courses WHERE courses.name = $1 LIMIT 1', [course_name]).first
+    if result
+       result['id']
+    else
+      raise InvalidSqlReguest
+    end
   end
 
   # TODO: implement real functionality!!!
   def get_user_id(http_basic_auth)
+    # we probably should auth and get our user_id
     return 2
   end
   # TODO: implement
   def save_event(event)
     puts "saving_event"
-    puts event.inspect
-    puts
+    result = @conn.exec('INSERT INTO student_events (course_id, data, event_type, exercise_name, happened_at, metadata_json, system_nano_time, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',   [ event[:course_id], event[:data], event[:event_type], event[:exercise_name], event[:happened_at], event[:metadata_json], event[:system_nano_time], event[:user_id]])
+    puts "saved #{result}"
     puts
   end
 end
 
 class BadRequest < StandardError; end
-
+class InvalidSqlReguest < StandardError; end
