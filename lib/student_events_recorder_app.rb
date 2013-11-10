@@ -49,7 +49,6 @@ class StudentEventsRecorderApp
   private
   def serve_request
     begin
-      puts @req.path
       if @req.post? && @req.path == '/student_events/.json'
         serve_post_task
       elsif @req.get? && @req.path == '/student_events/status.json'
@@ -104,7 +103,6 @@ class StudentEventsRecorderApp
 
     params = @req.params
     event_records = params['events'].values
-    puts params['data'].inspect
     File.open(params['data'][:tempfile].path, 'rb') do |data_file|
       event_records.each do |record|
         puts record.inspect
@@ -145,6 +143,7 @@ class StudentEventsRecorderApp
     if result
       result['name']
     else
+      puts "cant find exercise"
       raise InvalidSqlReguest
     end
   end
@@ -154,18 +153,16 @@ class StudentEventsRecorderApp
     if result
        result['id']
     else
+      puts "cant find course"
       raise InvalidSqlReguest
     end
   end
 
   def get_user_id(http_basic_auth)
-    puts "getting user id"
-    puts http_basic_auth
-    username, password =  Base64.decode64(http_basic_auth).split(":")
-    puts username
-    puts password
+    return nil if http_basic_auth.nil?
+
+    username, password =  Base64.decode64(http_basic_auth.split(" ")[1]).split(":")
     user = User.authenticate(username, password)
-    puts "got user #{user}"
     if user
       user.id
     else
