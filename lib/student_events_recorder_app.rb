@@ -1,15 +1,28 @@
+require 'pg'
+require 'yaml'
+require 'erb'
+
+
 class StudentEventsRecorderApp
 
+  def initialize
+    db_name, password = get_db_connection_info_from_rails
+    @conn = PG.connect(dbname: db_name, password: password)
+  end
+
+  def get_db_connection_info_from_rails
+    root_dir = File.expand_path('../', File.dirname(__FILE__))
+    db_config = YAML.load(ERB.new(File.read(root_dir + '/config/database.yml')).result)
+    env = db_config[Rails.env]
+    return env['database'], env['password']
+  end
 
   def call(env)
     raw_response = nil
     @req = Rack::Request.new(env)
     @resp = Rack::Response.new
-    puts "\n\nstarting"
 
     @http_basic = @req.env["HTTP_AUTHORIZATION"]
-   # puts @req.params.inspect
-    puts "done \n\n"
     if @req.path.end_with?('.html')
       @resp['Content-Type'] = 'text/html; charset=utf-8'
       @respdata = ''
@@ -36,7 +49,8 @@ class StudentEventsRecorderApp
   private
   def serve_request
     begin
-      if @req.post? && @req.path == '/student_events.json'
+      puts @req.path
+      if @req.post? && @req.path == '/student_events/.json'
         serve_post_task
       elsif @req.get? && @req.path == '/student_events/status.json'
         serve_status
@@ -60,7 +74,7 @@ class StudentEventsRecorderApp
         @respdata << "<html><body>Bad request</body></html>"
       end
     rescue
-      AppLog.warn("Error processing request:\n#{AppLog.fmt_exception($!)}")
+      puts("Error processing request:\n#{$!}")
       @resp.status = 500
       case @request_type
       when :json
@@ -78,7 +92,6 @@ class StudentEventsRecorderApp
   def serve_post_task
     if @req.params['events']
       handle_events
-      # it shoud do somethig with events json :D
       @respdata[:status] = 'ok'
     else
       @resp.status = 500
@@ -91,14 +104,10 @@ class StudentEventsRecorderApp
 
     params = @req.params
     event_records = params['events'].values
-
-    File.open(params['data'].tempfile.path, 'rb') do |data_file|
-      ex_map = {}
-      Exercise.includes(:course).each do |ex|
-        ex_map["#{ex.course.name} #{ex.name}"] = ex
-      end
-
+    puts params['data'].inspect
+    File.open(params['data'][:tempfile].path, 'rb') do |data_file|
       event_records.each do |record|
+        puts record.inspect
         course_id = get_course_id(record['course_name'])
         exercise_name = get_exercise_name_within_course(course_id, record['exercise_name'])
 
@@ -131,23 +140,26 @@ class StudentEventsRecorderApp
     end
   end
 
-  # TODO: implement
   def get_exercise_name_within_course(course, ex_name)
-    # SELECT "exercises".* FROM "exercises" WHERE "exercises"."course_id" = 1 AND "exercises"."name" = 'viikko3-3.1.Polynomi' LIMIT 1
+    @conn.exec("SELECT exercises.name FROM exercises WHERE exercises.course_id = $1 AND exercises.name = $2 LIMIT 1", [1, 'viikko3-3.1.Polynomi']).first['name']
   end
 
-  # TODO: implement
   def get_course_id(course_name)
-    # SELECT "courses".* FROM "courses" WHERE "courses"."name" = 'tira-k2012-paja' LIMIT 1
+    @conn.exec('SELECT courses.id FROM courses WHERE courses.name = $1 LIMIT 1', [course_name]).first['id']
   end
 
   # TODO: implement real functionality!!!
   def get_user_id(http_basic_auth)
-    return 1
+    return 2
   end
   # TODO: implement
   def save_event(event)
-
-
+    puts "saving_event"
+    puts event.inspect
+    puts
+    puts
   end
 end
+
+class BadRequest < StandardError; end
+
