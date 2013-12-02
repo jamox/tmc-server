@@ -1,17 +1,22 @@
 require 'test_helper'
 require 'tempfile'
 require 'rails/performance_test_help'
+require 'base64'
 
 class StudentEventsTest < ActionDispatch::PerformanceTest
   SMALL_EVENTS = 500
   LARGE_EVENTS = 100
 
   def setup
-    @exercise = Factory.create(:exercise)
-    @course = @exercise.course
-    @user = Factory.create(:user)
+    @user = User.create!(login: "demo", password: "demo", email: "demo@demo.demo")
+    @course = Course.create!(name: "democourse", source_url: "http://google.com")
+    @exercise = Exercise.create(name: "demoex", course: @course)
+    #@exercise = Factory.create(:exercise)
+    #@course = @exercise.course
+    #@user = Factory.create(:user)
     @small_file = Tempfile.open('tmc-perftest')
     @large_file = Tempfile.open('tmc-perftest')
+
 
     @small_events = {}
     SMALL_EVENTS.times do |i|
@@ -26,7 +31,7 @@ class StudentEventsTest < ActionDispatch::PerformanceTest
     @small_file.rewind
     @large_file.rewind
 
-    post '/sessions', :session => { :login => @user.login, :password => @user.password }
+    post '/sessions', :session => { :login => @user.login, :password => @user.password }}
   end
 
   def uploaded_file(tempfile)
@@ -52,7 +57,8 @@ class StudentEventsTest < ActionDispatch::PerformanceTest
       :data => uploaded_file(@small_file)
     }
 
-    post '/student_events.json', params
+    basic_auth = "Basic #{Base64.decode64("demo:demo")}"
+    post '/student_events.json', params, {"HTTP_AUTHORIZATION" => basic_auth }
     assert(response.successful?)
   end
 
@@ -63,7 +69,9 @@ class StudentEventsTest < ActionDispatch::PerformanceTest
       :data => uploaded_file(@large_file)
     }
 
-    post '/student_events.json', params
+
+    basic_auth = "Basic #{Base64.decode64("demo:demo")}"
+    post '/student_events.json', params, {"HTTP_AUTHORIZATION" => basic_auth }
     assert(response.successful?)
   end
 

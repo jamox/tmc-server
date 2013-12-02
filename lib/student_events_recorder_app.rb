@@ -99,6 +99,7 @@ class StudentEventsRecorderApp
   end
 
   def handle_events
+    puts @req.env.inspect
     user_id = get_user_id(@req.env["HTTP_AUTHORIZATION"])
 
     params = @req.params
@@ -138,11 +139,14 @@ class StudentEventsRecorderApp
     end
   end
 
+  # why we have this??? yea to validate stuff...
   def get_exercise_name_within_course(course_id, ex_name)
     result = @conn.exec("SELECT exercises.name FROM exercises WHERE exercises.course_id = $1 AND exercises.name = $2 LIMIT 1", [course_id, ex_name]).first
     if result
       result['name']
     else
+      e = Exercise.find_by_name(ex_name)
+      return e.name if e
       puts "cant find exercise"
       raise InvalidSqlReguest
     end
@@ -153,13 +157,20 @@ class StudentEventsRecorderApp
     if result
        result['id']
     else
+      c = Course.find_by_name(course_name)
+      return c.id if c
+      puts "moi"
+      res = @conn.exec("SELECT * FROM courses")
+      puts res.inspect
+      puts Rails.env
+      res.each {|a| puts a}
       puts "cant find course"
       raise InvalidSqlReguest
     end
   end
 
   def get_user_id(http_basic_auth)
-    return nil if http_basic_auth.nil?
+    raise InvalidUser if http_basic_auth.nil?
 
     username, password =  Base64.decode64(http_basic_auth.split(" ")[1]).split(":")
     user = User.authenticate(username, password)
