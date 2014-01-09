@@ -143,22 +143,6 @@ ActiveRecord::Schema.define(:version => 20140112141119) do
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
-  create_table "student_events", :force => true do |t|
-    t.integer  "user_id",                                       :null => false
-    t.integer  "course_id"
-    t.string   "exercise_name",                                 :null => false
-    t.string   "event_type",                                    :null => false
-    t.binary   "data",                                          :null => false
-    t.datetime "happened_at",                                   :null => false
-    t.integer  "system_nano_time", :limit => 8
-    t.string   "metadata_json"
-    t.string   "course_name",                   :default => ""
-  end
-
-  add_index "student_events", ["event_type"], :name => "index_student_events_on_event_type"
-  add_index "student_events", ["user_id", "course_id", "exercise_name", "event_type", "happened_at"], :name => "index_student_events_user_course_exercise_type_time"
-  add_index "student_events", ["user_id", "event_type", "happened_at"], :name => "index_student_events_user_type_time"
-
   create_table "submission_data", :id => false, :force => true do |t|
     t.integer "submission_id",       :null => false
     t.binary  "return_file"
@@ -194,10 +178,10 @@ ActiveRecord::Schema.define(:version => 20140112141119) do
     t.boolean  "review_dismissed",                            :default => false, :null => false
     t.boolean  "paste_available",                             :default => false, :null => false
     t.text     "message_for_paste"
+    t.string   "paste_key"
     t.datetime "client_time"
     t.integer  "client_nanotime",                :limit => 8
     t.text     "client_ip"
-    t.string   "paste_key"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"
