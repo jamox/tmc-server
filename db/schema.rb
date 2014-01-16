@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140112141119) do
+ActiveRecord::Schema.define(:version => 20140116183756) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(:version => 20140112141119) do
     t.datetime "refreshed_at"
     t.boolean  "locked_exercise_points_visible", :default => true,     :null => false
     t.text     "description"
+    t.string   "paste_visibility"
   end
 
   create_table "exercises", :force => true do |t|
