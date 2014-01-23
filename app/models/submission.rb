@@ -54,7 +54,7 @@ class Submission < ActiveRecord::Base
 
   def processing_time
     if self.processing_completed_at.nil? or self.processing_completed_at.nil?
-      -1
+      nil
     else
       (self.processing_completed_at - self.processing_attempts_started_at).round
     end
