@@ -39,4 +39,5 @@ TmcServer::Application.configure do
 
   # Log to stdout. Uncomment when debugging.
   #config.logger = Logger.new(STDOUT)
+  config.eager_load = false
 end
