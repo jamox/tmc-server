@@ -14,9 +14,9 @@
 class Unlock < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
-  belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "exercises.course_id = #{self.course_id}" }
-  # the DB validates uniqueness for (user_id, course_id, :exercise_name)
+  belongs_to :exercise, -> { "exercises.course_id = #{self.course_id}" },
+ :foreign_key => :exercise_name, :primary_key => :name
+      # the DB validates uniqueness for (user_id, course_id, :exercise_name)
 
   # refresh_[all_]unlocks creates missing unlocks (unless explicit unlock required) and
   # deletes unlocks that are no longer permitted due to an update in the exercise specs

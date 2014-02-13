@@ -4,14 +4,14 @@ class Exercise < ActiveRecord::Base
   belongs_to :course
 
   has_many :available_points, :dependent => :delete_all
-  has_many :submissions, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "submissions.course_id = #{self.course_id}" }
-  has_many :feedback_answers, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "feedback_answers.course_id = #{self.course_id}" }
-  has_many :unlocks, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "unlocks.course_id = #{self.course_id}" }
+  has_many :submissions, ->  { "submissions.course_id = #{self.course_id}" },
+    :foreign_key => :exercise_name, :primary_key => :name
+  has_many :feedback_answers, -> { "feedback_answers.course_id = #{self.course_id}" },
+    :foreign_key => :exercise_name, :primary_key => :name
+  has_many :unlocks, -> {"unlocks.course_id = #{self.course_id}" },
+    :foreign_key => :exercise_name, :primary_key => :name
 
-  validates :gdocs_sheet, :format => { :without => /^(MASTER|PUBLIC)$/ }
+  validates :gdocs_sheet, :format => { :without => /\A(MASTER|PUBLIC)\z/ }
 
   scope :course_gdocs_sheet_exercises, lambda { |course, gdocs_sheet|
     where(:course_id => course.id, :gdocs_sheet => gdocs_sheet)

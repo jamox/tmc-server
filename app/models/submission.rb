@@ -4,18 +4,19 @@ require 'securerandom'
 class Submission < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
-  belongs_to :exercise, :foreign_key => :exercise_name, :primary_key => :name,
-    :conditions => proc { "exercises.course_id = #{self.course_id}" } # TODO: self.course_id not available when doing includes(:exercise))
+  belongs_to :exercise,-> { "exercises.course_id = #{self.course_id}" }, :foreign_key => :exercise_name, :primary_key => :name # TODO: self.course_id not available when doing includes(:exercise))
 
   has_one :submission_data, :dependent => :delete
   after_save { submission_data.save! if submission_data }
 
-  has_many :test_case_runs, :dependent => :delete_all, :order => :id
-  has_many :reviews, :dependent => :delete_all, :order => :created_at do
-    def latest
-      self.order('created_at DESC').limit(1).first
-    end
-  end
+  has_many :test_case_runs, -> { order :id }, :dependent => :delete_all
+  has_many :reviews, -> {order :created_at }, :dependent => :delete_all
+
+  #do
+  #  def latest
+  #    self.order('created_at DESC').limit(1).first
+  #  end
+  #end
   has_many :awarded_points, :dependent => :nullify
   has_many :feedback_answers, :dependent => :nullify
 
