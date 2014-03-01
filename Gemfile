@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 # An alternative when rubygems.org is down
 #source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 3.2.0'
+gem 'rails', path: '/Users/jamo/git/oss/rails'
 
 gem 'rake'
 gem 'google-spreadsheet-ruby'
@@ -11,7 +11,7 @@ gem 'jquery-rails'
 gem 'cancan', '~> 1.6.10'
 gem 'rest-client', '~> 1.6.7'
 gem 'daemons', '~> 1.1.9'
-gem 'pg_comment', '~> 0.2.1'
+gem 'pg_comment'#, '~> 0.2.1'
 gem 'natcmp', '~> 1.4'
 gem 'foreigner', '~> 1.1.6'
 gem 'xml-simple', '~> 1.1.1'
@@ -20,6 +20,8 @@ gem 'andand'
 gem 'haml-rails'
 gem 'acts_as_api'
 gem 'mimemagic'
+
+gem 'activerecord-session_store'
 
 group :development, :test do
   gem 'rspec', '~> 2.8.0'
