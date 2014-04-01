@@ -40,6 +40,7 @@ class SubmissionsController < ApplicationController
       format.json do
         output = {
           :api_version => ApiVersion::API_VERSION,
+          :all_tests_passed => @submission.all_tests_passed?,
           :exercise_name      => @submission.exercise.name,
           :status => @submission.status,
           :points => @submission.points_list,
@@ -71,6 +72,7 @@ class SubmissionsController < ApplicationController
 
         if @submission.paste_available?
           output[:paste_url] = paste_url(@submission.paste_key)
+          output[:message_for_paste] = @submission.message_for_paste
         end
 
         output[:reviewed] = @submission.reviewed?
