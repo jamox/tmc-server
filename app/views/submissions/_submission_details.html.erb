@@ -27,14 +27,16 @@
           (<%= raw(all_points.map {|pt| '<span class="' + pt[1] + '">' + h(pt[0]) + '</span>' }.join(', ')) %>).
         </li>
       <% end %>
-      <li>
-        Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %> by
-        <% if current_user.administrator? %>
-          <%= link_to @submission.user.login, participant_path(@submission.user) %>.
-        <% else %>
-          <%= @submission.user.login %>.
-        <% end %>
-      </li>
+      <% if current_user.administrator? or not @is_paste %>
+        <li>
+          Submitted at <%= @submission.created_at.strftime("%H:%M %d.%m.%Y") %> by
+          <% if current_user.administrator? %>
+            <%= link_to @submission.user.login, participant_path(@submission.user) %>.
+          <% else %>
+            <%= @submission.user.login %>.
+          <% end %>
+        </li>
+      <% end %>
       <% if [@submission.processing_attempts_started_at, @submission.processing_completed_at].all? %>
         <li>Took <%= (@submission.processing_completed_at - @submission.processing_attempts_started_at).round %> seconds to process.</li>
       <% end %>
@@ -42,15 +44,15 @@
         <li>Needed <%= @submission.times_sent_to_sandbox %> processing attempts.</li>
       <% end %>
 
-      <li><%= link_to "View submitted files", submission_files_path(@submission) %></li>
-
       <% if can? :read, @submission %>
         <li><%= link_to "Download as zip", submission_path(@submission, :format => 'zip') %></li>
       <% end %>
+
       <% if can? :create, Review %>
         <li><%= link_to "Start code review", new_submission_review_path(@submission) %></li>
       <% end %>
-      <% if @submission.paste_available? and not @submission.all_tests_passed? and not controller.controller_name == 'files' %>
+
+      <% if @submission.paste_available? and not @submission.all_tests_passed? and not @is_paste %>
         <li><%= link_to "Show Paste", paste_path(@submission.paste_key) %></li>
       <% end %>
 

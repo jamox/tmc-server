@@ -1,85 +1,83 @@
 <h1>Submission <%= @submission.id %></h1>
 <%= render 'submission_details' %>
 
+<% if can? :update, @submission %>
+  <div class="row-fluid">
+    <div class="span11">
+      <h2>Rerun submission</h2>
+        <div class="well">
+          <div>
+            <%= form_tag submission_path(@submission), :method => :put do %>
+              <%= hidden_field_tag('rerun', '1')  %>
+              <div>
+                <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
+              </div>
+              (may add points; never deletes points)
+            <% end %>
+          </div>
+      </div>
+  </div>
+<% end %>
+
+<ul class="nav nav-tabs" id="myTab">
+  <% if @submission.feedback_answers.any? %>
+    <li><a href="#feedback" data-toggle="tab">Feedback</a></li>
+  <% end %>
+  <% if @submission.pretest_error %>
+    <li><a href="#compilationError" data-toggle="tab">Compilation Error</a></li>
+  <% end %>
+  <% unless @submission.pretest_error %>
+    <li><a href="#testResults" data-toggle="tab">Test Results</a></li>
+  <% end %>
+  <li class="<%= unless @is_paste then 'active' end %>"><a href="#logs" data-toggle="tab">Logs</a></li>
+  <li class="<%= if @is_paste then 'active' end %>"><a href="#files" data-toggle="tab">Files</a></li>
+</ul>
+
 <div class="row-fluid">
-  <div class="span11">
-    <h2>Results</h2>
-      <div class="well">
-      <% if can? :update, @submission %>
-        <div>
-          <%= form_tag submission_path(@submission), :method => :put do %>
-            <%= hidden_field_tag('rerun', '1')  %>
-            <div>
-              <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
+  <div class="span12">
+    <div class="tab-content">
+      <% if @submission.feedback_answers.any? %>
+        <div class="tab-pane" id="feedback">
+          <% unless @submission.feedback_answers.empty? %>
+            <div class="row-fluid">
+              <h2>Feedback</h2>
+              <div class="span11">
+                <!-- Ugly hack used to get stuff to correct place -->
+              <div>
+                <% answers = @submission.feedback_answers.to_a.sort_by {|a| a.feedback_question.position }%>
+                <% for answer in answers %>
+                  <div class="feedback-question">
+                    <%= answer.feedback_question.question %>
+                  </div>
+                  <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
+                <% end %>
+              </div>
             </div>
-            (may add points; never deletes points)
           <% end %>
         </div>
       <% end %>
 
       <% if @submission.pretest_error %>
-        <pre class="error"><%= @submission.pretest_error %></pre>
-      <% end %>
-
-      <%= render 'submissions/details' %>
-    </div>
-</div>
-
-<% if !@submission.stdout.blank? || !@submission.stderr.blank? %>
-  <div class="row-fluid">
-    <h2>Output</h2>
-    <div class="span11">
-      <p>The following was output while running the tests.</p>
-      <% if !@submission.stdout.blank? %>
-        <% if @submission.stderr.blank? %>
-          <h3>Standard output (System.out)</h3>
-        <% end %>
-        <pre><%= @submission.stdout %></pre>
-      <% end %>
-
-      <% if !@submission.stderr.blank? %>
-        <h3>Error output (System.err)</h3>
-        <pre><%= @submission.stderr %></pre>
-      <% end %>
-    </div>
-  </div>
-<% end %>
-
-<% if !@submission.valgrind.blank? %>
-  <div class="row-fluid">
-  <h2>Valgrind output</h2>
-    <div class="span11">
-      <p>Valgrind output is shown below..</p>
-        <pre><%= @submission.valgrind %></pre>
-    </div>
-  </div>
-<% end %>
-
-<% if current_user.administrator? && !@submission.vm_log.blank? %>
-  <div class="row-fluid">
-    <div class="span11">
-      <h2>Full sandbox log</h2>
-      <pre><%= @submission.vm_log %></pre>
-    </div>
-  </div>
-<% end %>
-
-<% unless @submission.feedback_answers.empty? %>
-  <div class="row-fluid">
-    <h2>Feedback</h2>
-    <div class="span11">
-      <!-- Ugly hack used to get stuff to correct place -->
-    <div>
-      <% answers = @submission.feedback_answers.to_a.sort_by {|a| a.feedback_question.position }%>
-      <% for answer in answers %>
-        <div class="feedback-question">
-          <%= answer.feedback_question.question %>
+        <div class="tab-pane" id="compilationError">
+            <% if @submission.pretest_error %>
+              <pre class="error"><%= @submission.pretest_error %></pre>
+            <% end %>
         </div>
-        <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
       <% end %>
+      <% unless @submission.pretest_error %>
+        <div class="tab-pane" id="testResults">
+          <%= render 'submissions/details' %>
+        </div>
+      <% end %>
+      <div class="tab-pane <%= unless @is_paste then 'active' end %>" id="logs">
+        <%= render 'logs' %>
+      </div>
+      <div class="tab-pane <%= if @is_paste then 'active' end %>" id="files">
+        <%= render :partial => 'files/files', :locals => {:files => @files} %>
+      </div>
     </div>
   </div>
-<% end %>
+</div>
 
 <%= link_back %>
 

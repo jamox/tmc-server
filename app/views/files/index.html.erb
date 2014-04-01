@@ -22,20 +22,12 @@
         <div class="accordion-group">
           <div class="accordion-heading">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#testResultsAccordion" href="#collapseOne">
-              <% if @submission.pretest_error? %>
-              <h2 class="">Failed to run tests</h2>
-              <% else %>
               <h2 class="">Test results</h2>
-              <% end %>
             </a>
           </div>
-          <div id="collapseOne" class="accordion-body collapse <%= @submission.pretest_error? ? 'in' : 'out' %>">
+          <div id="collapseOne" class="accordion-body collapse out">
             <div class="accordion-inner">
-              <% if @submission.pretest_error? %>
-              <pre class="error"><%= @submission.pretest_error %></pre>
-              <% else %>
               <%= render 'submissions/details' %>
-              <% end %>
             </div>
           </div>
         </div>
