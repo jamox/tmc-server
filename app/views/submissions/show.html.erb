@@ -21,16 +21,16 @@
 
 <ul class="nav nav-tabs" id="myTab">
   <% if @submission.feedback_answers.any? %>
-    <li><a href="#feedback" data-toggle="tab">Feedback</a></li>
+    <li><a href="#feedback" >Feedback</a></li>
   <% end %>
   <% if @submission.pretest_error %>
-    <li><a href="#compilationError" data-toggle="tab">Compilation Error</a></li>
+    <li><a href="#compilationError" >Compilation Error</a></li>
   <% end %>
   <% unless @submission.pretest_error %>
-    <li><a href="#testResults" data-toggle="tab">Test Results</a></li>
+    <li><a href="#testResults" >Test Results</a></li>
   <% end %>
-  <li class="<%= unless @is_paste then 'active' end %>"><a href="#logs" data-toggle="tab">Logs</a></li>
-  <li class="<%= if @is_paste then 'active' end %>"><a href="#files" data-toggle="tab">Files</a></li>
+  <li class="<%= unless @is_paste then 'active' end %>"><a href="#logs">Logs</a></li>
+  <li class="<%= if @is_paste then 'active' end %>"><a href="#files">Files</a></li>
 </ul>
 
 <div class="row-fluid">
@@ -39,45 +39,53 @@
       <% if @submission.feedback_answers.any? %>
         <div class="tab-pane" id="feedback">
           <% unless @submission.feedback_answers.empty? %>
-            <div class="row-fluid">
-              <h2>Feedback</h2>
-              <div class="span11">
-                <!-- Ugly hack used to get stuff to correct place -->
-              <div>
-                <% answers = @submission.feedback_answers.to_a.sort_by {|a| a.feedback_question.position }%>
-                <% for answer in answers %>
-                  <div class="feedback-question">
-                    <%= answer.feedback_question.question %>
-                  </div>
-                  <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
-                <% end %>
+            <h2>Feedback</h2>
+            <% answers = @submission.feedback_answers.to_a.sort_by {|a| a.feedback_question.position }%>
+            <% for answer in answers %>
+              <div class="feedback-question">
+                <%= answer.feedback_question.question %>
               </div>
-            </div>
+              <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
+            <% end %>
           <% end %>
         </div>
       <% end %>
 
       <% if @submission.pretest_error %>
         <div class="tab-pane" id="compilationError">
-            <% if @submission.pretest_error %>
-              <pre class="error"><%= @submission.pretest_error %></pre>
-            <% end %>
+          <% if @submission.pretest_error %>
+            <pre class="error"><%= @submission.pretest_error %></pre>
+          <% end %>
         </div>
       <% end %>
+
       <% unless @submission.pretest_error %>
         <div class="tab-pane" id="testResults">
           <%= render 'submissions/details' %>
         </div>
       <% end %>
+
       <div class="tab-pane <%= unless @is_paste then 'active' end %>" id="logs">
         <%= render 'logs' %>
       </div>
+
       <div class="tab-pane <%= if @is_paste then 'active' end %>" id="files">
         <%= render :partial => 'files/files', :locals => {:files => @files} %>
       </div>
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#myTab a').click(function (e) {
+      console.log($(this));
+      console.log("E: " + e);
+      $(this).tab('show');
+    })
+  });
+
+</script>
 
 <%= link_back %>
 

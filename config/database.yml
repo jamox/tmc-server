@@ -2,7 +2,7 @@ development:
   adapter: postgresql
   username: tmc
   password: tmc
-  database: tmc-development
+  database: tmc # -development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

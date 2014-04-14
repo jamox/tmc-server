@@ -179,10 +179,10 @@ ActiveRecord::Schema.define(:version => 20140116183756) do
     t.boolean  "review_dismissed",                            :default => false, :null => false
     t.boolean  "paste_available",                             :default => false, :null => false
     t.text     "message_for_paste"
+    t.string   "paste_key"
     t.datetime "client_time"
     t.integer  "client_nanotime",                :limit => 8
     t.text     "client_ip"
-    t.string   "paste_key"
   end
 
   add_index "submissions", ["course_id", "exercise_name"], :name => "index_submissions_on_course_id_and_exercise_name"

@@ -7,14 +7,13 @@
     %meta{:content => "", :name => "description"}
     %meta{:content => "", :name => "author"}
     = csrf_meta_tags
-    = stylesheet_link_tag 'main'
-    = stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css'
-    = stylesheet_link_tag "bootstrap.css"
     - if Rails.env == 'test'
       = stylesheet_link_tag 'highlighting'
     = render "layouts/metadata"
-    = javascript_include_tag 'bootstrap.js'
     = yield(:head)
+    = stylesheet_link_tag 'main'
+    = stylesheet_link_tag '/themes/smoothness/jquery-ui-1.8.23.custom.css'
+    = stylesheet_link_tag "bootstrap.min.css"
   %body.default
     .navbar.navbar-fixed-top.navbar-inverse
       .navbar-inner

@@ -14,7 +14,7 @@
 
 <%= javascript_include_tag(
       'underscore-min.js',
-      'jquery',
+      'jquery.min.js',
       'jquery_ujs',
       'jquery-ui',
       'jquery.dataTables.min',
@@ -24,7 +24,9 @@
       comet_js_url('org/cometd.js'),
       comet_js_url('jquery/jquery.cometd.js'),
       'comet_connection.js',
-      'review_notifications.js'
+      'review_notifications.js',
+      'bootstrap.min.js'
+
     )
 %>
 <% if @show_page_presence %>
