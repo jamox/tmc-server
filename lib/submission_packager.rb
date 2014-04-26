@@ -44,7 +44,47 @@ class SubmissionPackager
     end
   end
 
-private
+
+  def send_submission(submission)
+    exercise = submission.exercise
+    Dir.mktmpdir do |tmpdir|
+      zip_path = "#{tmpdir}/submission.zip"
+      return_zip_path = "#{tmpdir}/submission_to_be_returned.zip"
+      File.open(zip_path, 'wb') {|f| f.write(submission.return_file) }
+      SubmissionPackager.get(exercise).package_submission_for_download(exercise, zip_path, return_zip_path, submission.params)
+      open(return_zip_path, 'rb'){|io| io.read }
+    end
+  end
+
+  def package_submission_for_download(exercise, zip_path, return_zip_path, extra_params = {})
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        FileUtils.mkdir_p('received')
+        FileUtils.mkdir_p('dest')
+
+        Dir.chdir('received') do
+          sh! ['unzip', zip_path]
+          # Stupid OS X default zipper puts useless crap into zip files :[
+          # Delete them or they might be mistaken for the actual source files later
+          FileUtils.rm_rf '__MACOSX'
+          # Let's clean up other similarly useless files while we're at it
+          FileUtils.rm_f ['.DS_Store', 'desktop.ini', 'Thumbs.db', '.directory']
+        end
+
+        received = Pathname(find_received_project_root(Pathname('received')))
+        dest = Pathname('dest')
+
+        write_extra_params(dest + '.tmcparams', extra_params) unless !extra_params || extra_params.empty?
+
+        copy_files(exercise, received, dest)
+        tmc_run = File.join(dest, 'tmc-run')
+        FileUtils.rm(tmc_run) if File.exists? tmc_run
+        sh! ['zip', '-r', return_zip_path, dest.to_s]
+      end
+    end
+  end
+
+  private
   include SystemCommands
 
   def find_received_project_root(received_root)

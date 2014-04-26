@@ -36,7 +36,16 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.zip { send_data(@submission.return_file, :filename => @submission.downloadable_file_name) }
+      format.zip do
+
+
+        data =  SubmissionPackager.get(@exercise).send_submission(@submission)
+
+        name = "#{@submission.user.login}-#{@exercise.name}-#{@submission.id}.zip"
+        send_data(data, :filename => name)
+
+      end
+      #format.zip { send_data(@submission.return_file, :filename => @submission.downloadable_file_name) }
       format.json do
         output = {
           :api_version => ApiVersion::API_VERSION,
