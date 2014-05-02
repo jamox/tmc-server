@@ -77,14 +77,18 @@
 </div>
 
 <script type="text/javascript">
-  $(document).ready(function() {
-    $('#myTab a').click(function (e) {
-      console.log($(this));
-      console.log("E: " + e);
-      $(this).tab('show');
-    })
-  });
+  $(document).ready(function(){
+    var hash = window.location.hash;
+    hash && $('ul.nav a[href="' + hash + '"]').tab('show');
 
+    $('#myTab a').click(function (e) {
+        $(this).tab('show');
+        var scrollmem = $('body').scrollTop();
+        window.location.hash = this.hash;
+        console.log("scroll " + scrollmem);
+        $('html,body').scrollTop(scrollmem - 60);
+      });
+  });
 </script>
 
 <%= link_back %>

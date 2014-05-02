@@ -46,3 +46,12 @@
           #page-presence
         = bootstrap_flash
         = yield
+
+
+
+    = javascript_include_tag('underscore-min.js', 'jquery.min.js', 'jquery_ujs', 'jquery-ui')
+    = javascript_include_tag('jquery.dataTables.min', 'jquery.cookie', 'misc.js', 'naturalSort.js')
+    = javascript_include_tag(comet_js_url('org/cometd.js'), comet_js_url('jquery/jquery.cometd.js'))
+    = javascript_include_tag('comet_connection.js', 'review_notifications.js', 'bootstrap.min.js')
+    - if @show_page_presence
+      = javascript_include_tag 'page_presence.js'
