@@ -17,7 +17,7 @@ class CourseRefresher
   def refresh_course(course)
     Impl.new.refresh_course(course)
   end
-  
+
   class Report
     def initialize
       @errors = []
@@ -27,12 +27,12 @@ class CourseRefresher
     attr_reader :errors
     attr_reader :warnings
     attr_reader :notices
-    
+
     def successful?
       @errors.empty?
     end
   end
-  
+
   class Failure < StandardError
     def initialize(report)
       super(report.errors.join("\n"))
@@ -40,12 +40,12 @@ class CourseRefresher
     end
     attr_reader :report
   end
-  
+
 private
 
   class Impl
     include SystemCommands
-    
+
     def refresh_course(course)
       @report = Report.new
 
@@ -85,14 +85,14 @@ private
       Course.transaction(:requires_new => true) do
         begin
           @course = Course.find(course.id, :lock => true)
-          
+
           @old_cache_path = @course.cache_path
-          
+
           @course.cache_version += 1 # causes @course.*_path to return paths in the new cache
-          
+
           FileUtils.rm_rf(@course.cache_path)
           FileUtils.mkdir_p(@course.cache_path)
-        
+
           update_or_clone_repository
           check_directory_names
           update_course_options
@@ -112,7 +112,7 @@ private
           @course.refreshed_at = Time.now
           @course.save!
           @course.exercises.each &:save!
-          
+
           CourseRefresher.simulate_failure! if ::Rails::env == 'test' && CourseRefresher.respond_to?('simulate_failure!')
         rescue StandardError, ScriptError # Some YAML parsers throw ScriptError on syntax errors
           @report.errors << $!.message + "\n" + $!.backtrace.join("\n")
@@ -124,13 +124,13 @@ private
           seed_maven_cache
         end
       end
-      
+
       course.reload # reload the record given as parameter
-      
+
       raise Failure.new(@report) unless @report.errors.empty?
       @report
     end
-    
+
     def update_or_clone_repository
       raise 'Source types other than git not yet implemented' if @course.source_backend != 'git'
 
@@ -146,7 +146,7 @@ private
         clone_repository
       end
     end
-    
+
     def copy_and_update_repository
       FileUtils.cp_r("#{@old_cache_path}/clone", "#{@course.clone_path}")
       Dir.chdir(@course.clone_path) do
@@ -155,7 +155,7 @@ private
         sh!('git', 'checkout', 'origin/' + @course.git_branch)
       end
     end
-    
+
     def clone_repository
       sh!('git', 'clone', '-q', '-b', @course.git_branch, @course.source_url, @course.clone_path)
     end
@@ -170,7 +170,7 @@ private
         end
       end
     end
-    
+
     def update_course_options
       options_file = "#{@course.clone_path}/course_options.yml"
 
@@ -186,15 +186,15 @@ private
       end
       @course.options = opts
     end
-    
+
     def exercise_dirs
       @exercise_dirs ||= ExerciseDir.find_exercise_dirs(@course.clone_path)
     end
-    
+
     def exercise_names
       @exercise_names ||= exercise_dirs.map { |ed| ed.name_based_on_path(@course.clone_path) }
     end
-    
+
     def add_records_for_new_exercises
       exercise_names.each do |name|
         if !@course.exercises.any? {|e| e.name == name }
@@ -203,7 +203,7 @@ private
         end
       end
     end
-    
+
     def delete_records_for_removed_exercises
       removed_exercises = @course.exercises.reject {|e| exercise_names.include?(e.name) }
       removed_exercises.each do |e|
@@ -212,7 +212,7 @@ private
         e.destroy
       end
     end
-    
+
     def update_exercise_options
       reader = RecursiveYamlReader.new
       @review_points = {}
@@ -248,7 +248,7 @@ private
         e.has_tests = true # we don't yet detect whether an exercise includes tests
       end
     end
-    
+
     def update_available_points
       @course.exercises.each do |exercise|
         review_points = @review_points[exercise.name]
@@ -353,7 +353,7 @@ private
         FileUtils.cp(TmcJunitRunner.get.lib_paths, stub_path + 'lib' + 'testrunner')
       end
     end
-    
+
     # Returns a sorted list of relative pathnames to stub files of the exercise.
     # These are checksummed and zipped.
     def stub_files(e)
@@ -374,7 +374,7 @@ private
       end
       result.sort
     end
-    
+
     def checksum_stubs
       @course.exercises.each do |e|
         base_path = Pathname("#{@course.stub_path}/#{e.relative_path}")
@@ -388,12 +388,12 @@ private
         e.checksum = digest.hexdigest
       end
     end
-    
+
     def make_zips_of_stubs
       FileUtils.mkdir_p(@course.stub_zip_path)
       @course.exercises.each do |e|
         zip_file_path = "#{@course.stub_zip_path}/#{e.name}.zip"
-        
+
         Dir.chdir(@course.stub_path) do
           IO.popen(mk_command(['zip', '--quiet', '-@', zip_file_path]), 'w') do |pipe|
             stub_files(e).each do |path|
@@ -418,18 +418,18 @@ private
         end
       end
     end
-    
+
     def set_permissions
       chmod = SiteSetting.value(:git_repos_chmod)
       chgrp = SiteSetting.value(:git_repos_chgrp)
-      
+
       parent_dirs = Course.cache_root.sub(::Rails.root.to_s, '').split('/').reject(&:blank?)
       for i in 0..(parent_dirs.length)
         dir = "#{::Rails.root}/#{parent_dirs[0..i].join('/')}"
         sh!('chmod', chmod, dir) unless chmod.blank?
         sh!('chgrp', chgrp, dir) unless chgrp.blank?
       end
-      
+
       sh!('chmod', '-R', chmod, @course.cache_path) unless chmod.blank?
       sh!('chgrp', '-R', chgrp, @course.cache_path) unless chgrp.blank?
     end
@@ -443,6 +443,6 @@ private
     end
 
   end
-  
+
 end
 

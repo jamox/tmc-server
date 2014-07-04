@@ -5,17 +5,18 @@
   <div class="row-fluid">
     <div class="span11">
       <h2>Rerun submission</h2>
-        <div class="well">
-          <div>
-            <%= form_tag submission_path(@submission), :method => :put do %>
-              <%= hidden_field_tag('rerun', '1')  %>
-              <div>
-                <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
-              </div>
-              (may add points; never deletes points)
-            <% end %>
-          </div>
+      <div class="well">
+        <div>
+          <%= form_tag submission_path(@submission), :method => :put do %>
+            <%= hidden_field_tag('rerun', '1')  %>
+            <div>
+              <%= button_tag 'Rerun submission', :type => 'submit', class: "btn btn-danger" %>
+            </div>
+            (may add points; never deletes points)
+          <% end %>
+        </div>
       </div>
+    </div>
   </div>
 <% end %>
 
@@ -27,10 +28,21 @@
     <li><a href="#compilationError" >Compilation Error</a></li>
   <% end %>
   <% unless @submission.pretest_error %>
-    <li><a href="#testResults" >Test Results</a></li>
+    <li><a href="#testResults" class="active">Test Results</a></li>
   <% end %>
-  <li class="<%= unless @is_paste then 'active' end %>"><a href="#logs">Logs</a></li>
-  <li class="<%= if @is_paste then 'active' end %>"><a href="#files">Files</a></li>
+  <% unless @submission.stdout.blank? %>
+    <li><a href="#stdout" >System.out</a></li>
+  <% end %>
+  <% unless @submission.stderr.blank? %>
+    <li><a href="#stderr" >System.err</a></li>
+  <% end %>
+  <% unless @submission.valgrind.blank? %>
+    <li><a href="#valgrind" >Valgrind</a></li>
+  <% end %>
+  <% if current_user.administrator? && !@submission.vm_log.blank? %>
+    <li class="<%= unless @is_paste then 'aactive' end %>"><a href="#logs">Logs</a></li>
+  <% end %>
+  <li class="<%= if @is_paste then 'aactive' end %>"><a href="#files">Files</a></li>
 </ul>
 
 <div class="row-fluid">
@@ -38,39 +50,52 @@
     <div class="tab-content">
       <% if @submission.feedback_answers.any? %>
         <div class="tab-pane" id="feedback">
-          <% unless @submission.feedback_answers.empty? %>
-            <h2>Feedback</h2>
-            <% answers = @submission.feedback_answers.to_a.sort_by {|a| a.feedback_question.position }%>
-            <% for answer in answers %>
-              <div class="feedback-question">
-                <%= answer.feedback_question.question %>
-              </div>
-              <p class="feedback-answer"><%= render_feedback_answer(answer) %></p>
-            <% end %>
-          <% end %>
+          <%= render 'feedback_answers' %>
         </div>
       <% end %>
 
       <% if @submission.pretest_error %>
         <div class="tab-pane" id="compilationError">
-          <% if @submission.pretest_error %>
-            <pre class="error"><%= @submission.pretest_error %></pre>
-          <% end %>
+          <%= render 'pretest_error' %>
         </div>
       <% end %>
 
       <% unless @submission.pretest_error %>
-        <div class="tab-pane" id="testResults">
+        <div class="tab-pane active" id="testResults">
           <%= render 'submissions/details' %>
         </div>
       <% end %>
 
-      <div class="tab-pane <%= unless @is_paste then 'active' end %>" id="logs">
-        <%= render 'logs' %>
-      </div>
+      <% unless @submission.stdout.blank? %>
+        <div class="tab-pane" id="stdout">
+          <%= render 'submissions/stdout' %>
+        </div>
+      <% end %>
 
-      <div class="tab-pane <%= if @is_paste then 'active' end %>" id="files">
-        <%= render :partial => 'files/files', :locals => {:files => @files} %>
+      <% unless @submission.stderr.blank? %>
+        <div class="tab-pane" id="stderr">
+          <%= render 'submissions/stderr' %>
+        </div>
+      <% end %>
+
+      <% unless @submission.valgrind.blank? %>
+        <div class="tab-pane" id="valgrind">
+          <%= render 'submissions/valgrind' %>
+        </div>
+      <% end %>
+
+      <% if current_user.administrator? && !@submission.vm_log.blank? %>
+        <div class="tab-pane <%= unless @is_paste then 'aactive' end %>" id="logs">
+          <%= render 'logs' %>
+        </div>
+      <% end %>
+
+      <div class="tab-pane <%= if @is_paste then 'aactive' end %>" id="files">
+        <div class="row-fluid">
+          <div class="span11">
+            <%= render :partial => 'files/files', :locals => {:files => @files} %>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -82,15 +107,13 @@
     hash && $('ul.nav a[href="' + hash + '"]').tab('show');
 
     $('#myTab a').click(function (e) {
-        $(this).tab('show');
-        var scrollmem = $('body').scrollTop();
-        window.location.hash = this.hash;
-        console.log("scroll " + scrollmem);
-        $('html,body').scrollTop(scrollmem - 60);
+      $(this).tab('show');
+      var scrollmem = $('body').scrollTop();
+      window.location.hash = this.hash;
+      $('html,body').scrollTop(scrollmem);
+      e.preventDefault();
       });
-  });
+    });
 </script>
 
 <%= link_back %>
-
-

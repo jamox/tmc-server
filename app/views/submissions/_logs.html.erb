@@ -1,38 +1,6 @@
-<% if !@submission.stdout.blank? || !@submission.stderr.blank? %>
-  <div class="row-fluid">
-    <h2>Output</h2>
-    <div class="span11">
-      <p>The following was output while running the tests.</p>
-      <% if !@submission.stdout.blank? %>
-        <% if @submission.stderr.blank? %>
-          <h3>Standard output (System.out)</h3>
-        <% end %>
-        <pre><%= @submission.stdout %></pre>
-      <% end %>
-
-      <% if !@submission.stderr.blank? %>
-        <h3>Error output (System.err)</h3>
-        <pre><%= @submission.stderr %></pre>
-      <% end %>
-    </div>
+<div class="row-fluid">
+  <div class="span11">
+    <h2>Full sandbox log</h2>
+    <pre><%= @submission.vm_log %></pre>
   </div>
-<% end %>
-
-<% if !@submission.valgrind.blank? %>
-  <div class="row-fluid">
-  <h2>Valgrind output</h2>
-    <div class="span11">
-      <p>Valgrind output is shown below..</p>
-        <pre><%= @submission.valgrind %></pre>
-    </div>
-  </div>
-<% end %>
-
-<% if current_user.administrator? && !@submission.vm_log.blank? %>
-  <div class="row-fluid">
-    <div class="span11">
-      <h2>Full sandbox log</h2>
-      <pre><%= @submission.vm_log %></pre>
-    </div>
-  </div>
-<% end %>
+</div>

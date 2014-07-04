@@ -174,8 +174,6 @@ describe "The system (used by a student)", :integration => true do
     page.should have_content('Ok')
 
     click_link 'Files'
-    # visit '/'
-    # id = Submission.last.id
     # visit "/submissions/#{id}/files"
     page.should have_content('src/SimpleStuff.java')
 

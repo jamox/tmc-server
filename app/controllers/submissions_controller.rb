@@ -6,6 +6,7 @@ class SubmissionsController < ApplicationController
   around_filter :course_transaction
   before_filter :get_course_and_exercise
 
+  # Manually checked for #show and index
   skip_authorization_check only: [:show, :index]
 
   def index
@@ -69,6 +70,8 @@ class SubmissionsController < ApplicationController
         if @exercise.solution.visible_to?(current_user)
           output[:solution_url] = view_context.exercise_solution_url(@exercise)
         end
+
+        output[:validations] = @submission.validations
 
         if @submission.paste_available?
           output[:paste_url] = paste_url(@submission.paste_key)
@@ -182,6 +185,7 @@ private
     end
   end
 
+  # Ugly manyal access control :/
   def get_course_and_exercise
     if params[:id]
       @submission = Submission.find(params[:id])
