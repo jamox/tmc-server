@@ -93,7 +93,7 @@ private
     unless current_user.guest?
       max_submissions = 100
       @submissions = @course.submissions
-      @submissions = @submissions.where(:user_id => current_user.id) unless current_user.administrator?
+      @submissions = @submissions.where(:user_id => current_user.id) unless can? :list_all_submissions, @course
       @submissions = @submissions.order('created_at DESC').includes(:user)
       @total_submissions = @submissions.count
       @submissions = @submissions.limit(max_submissions)

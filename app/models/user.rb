@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
   has_many :reviews, :foreign_key => :reviewer_id, :inverse_of => :reviewer, :dependent => :nullify
   has_many :course_notifications
   has_many :comments
+  has_many :permissions, dependent: :delete_all
 
   validates :login, :presence     => true,
                     :uniqueness   => true,

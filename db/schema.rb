@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140519103112) do
+ActiveRecord::Schema.define(:version => 20140712170541) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -105,6 +105,14 @@ ActiveRecord::Schema.define(:version => 20140519103112) do
     t.integer  "user_id",    :null => false
     t.text     "code",       :null => false
     t.datetime "created_at", :null => false
+  end
+
+  create_table "permissions", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "course_id"
+    t.string   "permissions"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "points_upload_queues", :force => true do |t|

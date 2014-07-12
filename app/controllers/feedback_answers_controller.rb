@@ -31,8 +31,8 @@ class FeedbackAnswersController < ApplicationController
     respond_to do |format|
       format.html do
         authorize! :read, @parent
-        authorize! :read, FeedbackQuestion
-        authorize! :read, FeedbackAnswer
+        authorize! :read_feedback_question, @parent
+        authorize! :read_feedback_answer, @parent
 
         @text_answers = @parent.feedback_answers.
           joins(:feedback_question).
@@ -97,7 +97,7 @@ class FeedbackAnswersController < ApplicationController
       })
     end
     answer_records.each {|record| authorize! :create, record }
-    
+
     begin
       ActiveRecord::Base.connection.transaction(:requires_new => true) do
         answer_records.each(&:save!)
