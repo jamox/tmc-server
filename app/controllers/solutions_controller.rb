@@ -10,7 +10,7 @@ class SolutionsController < ApplicationController
 
     @solution = @exercise.solution
     begin
-      authorize! :read, @solution
+      authorize! :read_solutions, @solution
     rescue CanCan::AccessDenied
       if current_user.guest?
         return respond_access_denied("Please log in to view the model solution.")

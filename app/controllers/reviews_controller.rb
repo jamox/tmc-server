@@ -55,7 +55,7 @@ class ReviewsController < ApplicationController
       :submission_id => @submission.id,
       :reviewer_id => current_user.id
     )
-    authorize! :create, @new_review
+    authorize! :create_code_reviews, @course
     render 'reviews/submission_index'
   end
 
@@ -66,7 +66,7 @@ class ReviewsController < ApplicationController
       :reviewer_id => current_user.id,
       :review_body => params[:review][:review_body]
     )
-    authorize! :create, @review
+    authorize! :create_code_reviews, @review.submission.course
 
     begin
       ActiveRecord::Base.connection.transaction do
@@ -98,7 +98,7 @@ class ReviewsController < ApplicationController
 
   def destroy
     fetch :review
-    authorize! :delete, @review
+    authorize! :delete_review, @review
     if @review.destroy
       flash[:success] = 'Code review deleted.'
       redirect_to new_submission_review_path(@review.submission_id)
@@ -166,7 +166,7 @@ private
 
   def update_review
     fetch :review
-    authorize! :update, @review
+    authorize! :update_review, @review
     @review.review_body = params[:review][:review_body]
 
     begin
@@ -196,15 +196,15 @@ private
   def fetch(*stuff)
     if stuff.include? :course
       @course = Course.find(params[:course_id])
-      authorize! :read, @course
+      authorize! :read_course, @course
     end
     if stuff.include? :submission
       @submission = Submission.find(params[:submission_id])
-      authorize! :read, @submission
+      authorize! :read_submission, @submission
     end
     if stuff.include? :review
       @review = Review.find(params[:id])
-      authorize! :read, @review
+      authorize! :read_code_reviews, @review
     end
     if stuff.include? :files
       @files = SourceFileList.for_submission(@submission)
@@ -247,6 +247,7 @@ private
           :user_id => submission.user_id,
           :name => point_name
         )
+        # TODO mites t''
         authorize! :create, pt
         pt.save!
       end

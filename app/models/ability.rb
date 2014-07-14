@@ -8,13 +8,11 @@ class Ability
   def initialize(user, session)
     if user.administrator?
       can :manage, :all
-      # TODO remove
-      can :create, Course
       can :create_course, Course
       can :refresh, Course
       can :refresh_course, Course
       can :view, :participants_list
-      can :rerun, Submission
+      can :rerun_submission, Submission
       can :refresh_gdocs_spreadsheet, Course do |c|
         !c.spreadsheet_key.blank?
       end
@@ -33,12 +31,26 @@ class Ability
       can :list_all_submissions, Course
       can :read_submission, Course
       can :read_exercise, Course
+      can :read_exercise, Exercise
       can :read_feedback_answers, Course
       can :read_feedback_questions, Course
       can :update_review, Review
       can :view_participants_list, Course
       can :read_solution, Solution
       can :read_code_reviews, Course
+      can :read_course, Course
+      can :list_user_emails
+      can :create_feedback_questions
+      can :update_feedback_questions, FeedbackQuestions
+      can :delete_feedback_questions, FeedbackQuestion
+      can :list_all_participants
+      can :show_administrators_in_points_list, Course
+      can :show_administrators_in_points_list, Course
+      can :list_reviewd_submissions, Course
+
+      can :delete_review, Review
+
+      can :list_reviewd_submissions, Course
     else
       can :read, :all
 
@@ -47,8 +59,40 @@ class Ability
         Permission.check!(user, c, :manage_permissions)
       end
 
+      can :delete_review, Review do |r|
+        Permission.check!(user, r.submission.course, :delete_review)
+      end
+
+      can :rerun_submission, Submission do |s|
+        Permission.check!(user, s.exercise.course, :rerun_submission)
+      end
+
+      can :view_expired_pastes, Submission do |s|
+        Permission.check!(user, s.exercise.course, :view_expired_pastes)
+      end
+
+      can :dismiss_review, Submission do |s|
+        Permission.check!(user, s.exercise.course, :dismiss_review)
+      end
+
+      can :list_reviewd_submissions, Course do |c|
+        Permission.check!(user, c, :list_reviewd_submissions)
+      end
+      can :show_administrators_in_points_list, Course do |c|
+        Permission.check!(user, c,  :show_administrators_in_points_list)
+      end
+
       can :read_vm_log, Submission do |s|
         !s.vm_log.blank? && Permission.check!(user, s.course, :read_vm_log)
+      end
+
+      can :show_administrators_in_points_list, Course do |c|
+        Permission.check!(user, c, :show_administrators_in_points_list)
+      end
+
+      # TODO pit'sk; t'' muutenkin sallia, koska kai ne jotain kursseja saa n'hd' :D
+      can :read_course, Course do |c|
+        Permission.check!(user, c, :read_course)
       end
 
       can :view_participants_list, Course do ||
@@ -80,7 +124,10 @@ class Ability
       end
 
       can :read_feedback_answers, Submission do |s|
-        Permission.check!(user, s, :read_feedback_answers)
+        Permission.check!(user, s.exercise.course, :read_feedback_answers)
+      end
+      can :read_feedback_answers, Course do |c|
+        Permission.check!(user, c, :read_feedback_answers)
       end
       cannot :read, User
 
@@ -93,8 +140,9 @@ class Ability
       end
 
       can :read, User, :id => user.id
-      can :create, User if SiteSetting.value(:enable_signup)
+      can :create_user, User if SiteSetting.value(:enable_signup)
 
+      # TODO kato miten kurssilistauksen teko pitas tehda
       cannot :read, Course
 
       # TODO maybe change to permissions check?
@@ -132,6 +180,10 @@ class Ability
 
       can :read_exercise, Course do |c|
         Permission.check!(user, c, :read_exercise)
+      en_feedback_answerd
+
+      can :read_exercise, Exercise do |e|
+        Permission.check!(user, e.course, :read_exercise)
       end
 
       # TODO remove
@@ -163,7 +215,7 @@ class Ability
       # TODO remove
       cannot :read, FeedbackAnswer
       # TODO remove
-      can :create, FeedbackAnswer do |ans|
+      can :create_feedback_answer, FeedbackAnswer do |ans|
         ans.submission.user_id == user.id
       end
 
@@ -181,6 +233,7 @@ class Ability
       end
 
       cannot :mark_as_read, Review
+
       can :mark_as_read, Review do |r|
         r.submission.user_id == user.id
       end
@@ -199,7 +252,18 @@ class Ability
       #  Permission.check!(user, c, :read_code_reviews)
       #end
 
-      cannot :reply, FeedbackAnswer
+      can :create_feedback_questions, FeedbackQuestions do |f|
+        Permission.check!(user, f.course, :create_feedback_questions)
+      end
+      can :update_feedback_questions, FeedbackQuestions do |f|
+        Permission.check!(user, f.course, :update_feedback_questions)
+      end
+
+      can :delete_feedback_questions, FeedbackQuestion do |f|
+        Permission.check!(user, f.course, :delete_feedback_questions)
+      end
+      # TODO ignore for noe
+      cannot :reply_feedback_answer, FeedbackAnswer
       cannot :email, CourseNotification
     end
   end

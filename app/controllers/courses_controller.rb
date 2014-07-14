@@ -11,6 +11,7 @@ class CoursesController < ApplicationController
       format.html do
         @ongoing_courses = Course.ongoing.order(ordering).select {|c| c.visible_to?(current_user) }
         @expired_courses = Course.expired.order(ordering).select {|c| c.visible_to?(current_user) }
+        # TODO
         authorize! :read, @ongoing_courses
         authorize! :read, @expired_courses
       end
@@ -53,7 +54,7 @@ class CoursesController < ApplicationController
 
   def refresh
     @course = Course.find(params[:id])
-    authorize! :refresh, @course
+    authorize! :refresh_course, @course
 
     begin
       session[:refresh_report] = @course.refresh
@@ -71,7 +72,7 @@ class CoursesController < ApplicationController
 
   def create
     @course = Course.new(params[:course])
-    authorize! :create, @course
+    authorize! :create_course, @course
 
     respond_to do |format|
       if @course.save
@@ -88,7 +89,7 @@ private
     @course = Course.find(params[:id])
     @exercises = @course.exercises.select {|ex| ex.visible_to?(current_user) }.natsort_by(&:name)
     @exercise_completion_status = ExerciseCompletionStatusGenerator.completion_status(current_user, @course)
-    authorize! :read, @course
+    authorize! :read_course, @course
 
     unless current_user.guest?
       max_submissions = 100

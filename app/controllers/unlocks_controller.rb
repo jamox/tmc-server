@@ -2,7 +2,7 @@
 class UnlocksController < ApplicationController
   def show
     @course = Course.find(params[:course_id])
-    authorize! :read, @course
+    authorize! :read_course, @course
     @exercises = @course.unlockable_exercises_for(current_user)
 
     respond_to do |format|
@@ -15,7 +15,7 @@ class UnlocksController < ApplicationController
 
   def create
     @course = Course.find(params[:course_id])
-    authorize! :read, @course
+    authorize! :read_course, @course
     @exercises = @course.unlockable_exercises_for(current_user)
 
     Unlock.unlock_exercises(@exercises, current_user)

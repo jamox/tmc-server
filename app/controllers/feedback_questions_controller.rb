@@ -10,21 +10,21 @@ class FeedbackQuestionsController < ApplicationController
     add_breadcrumb 'Feedback questions'
 
     @questions = @course.feedback_questions.order(:position)
-    authorize! :show, @questions
+    authorize! :read_feedback_questions, @questions
   end
-  
+
   def new
     @question = FeedbackQuestion.new(:course => @course)
-    authorize! :create, @question
+    authorize! :create_feedback_questions, @question
   end
 
   def create
     @question = FeedbackQuestion.new(params[:feedback_question])
     @question.course = @course
-    authorize! :create, @question
+    authorize! :create_feedback_questions, @question
 
     fix_question_kind(@question)
-    
+
     if @question.save
       flash[:success] = 'Question created.'
       redirect_to course_feedback_questions_path(@question.course)
@@ -37,15 +37,15 @@ class FeedbackQuestionsController < ApplicationController
   def show
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! :read,  @question
-    authorize! :read,  @course
+    authorize! :read_question,  @question
+    authorize! :read_course,  @course
   end
 
   def update
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! :read,  @course
-    authorize! :update, @question
+    authorize! :read_course,  @course
+    authorize! :update_feedback_questions, @question
 
     @question.question = params[:feedback_question][:question]
     @question.title = params[:feedback_question][:title]
@@ -62,8 +62,8 @@ class FeedbackQuestionsController < ApplicationController
   def destroy
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! :read,  @course
-    authorize! :delete, @question
+    authorize! :read_course,  @course
+    authorize! :delete_feedback_questions, @question
 
     begin
       @question.destroy
@@ -74,11 +74,11 @@ class FeedbackQuestionsController < ApplicationController
       redirect_to course_feedback_questions_path(@course)
     end
   end
-  
+
 private
   def get_course
     @course = Course.find(params[:course_id]) if params[:course_id]
-    authorize! :read, @course
+    authorize! :read_course, @course
   end
 
   def fix_question_kind(question)

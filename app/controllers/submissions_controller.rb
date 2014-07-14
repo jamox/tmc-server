@@ -123,7 +123,7 @@ class SubmissionsController < ApplicationController
         :client_ip => request.env["HTTP_X_FORWARDED_FOR"] || request.remote_ip
       )
 
-      authorize! :create, @submission
+      authorize! :create_submission, @submission
 
       if !@submission.save
         errormsg = 'Failed to save submission.'
@@ -157,11 +157,12 @@ class SubmissionsController < ApplicationController
 
   def update
     submission = Submission.find(params[:id]) || respond_not_found
-    authorize! :update, submission
     if params[:rerun]
+      authorize! :rerun_submission, submission
       schedule_for_rerun(submission, -1)
       redirect_to submission_path(submission), :notice => 'Rerun scheduled'
     elsif params[:dismiss_review]
+      authorize! :dismiss_review, submission
       submission.review_dismissed = true
       submission.save!
       redirect_to new_submission_review_path(submission), :notice => 'Code review dismissed'
@@ -188,14 +189,14 @@ private
   def get_course_and_exercise
     if params[:id]
       @submission = Submission.find(params[:id])
-      authorize! :read, @submission
+      authorize! :read_submission, @submission
       @course = @submission.course
       @exercise = @submission.exercise
     elsif params[:exercise_id]
       @exercise = Exercise.find(params[:exercise_id])
       @course = Course.find(@exercise.course_id, :lock => 'FOR SHARE')
-      authorize! :read, @course
-      authorize! :read, @exercise
+      authorize! :read_course, @course
+      authorize! :read_exercise, @exercise
     elsif params[:paste_key]
       @submission = Submission.find_by_paste_key!(params[:paste_key])
       @exercise = @submission.exercise
@@ -204,7 +205,7 @@ private
       check_access!
     elsif params[:course_id]
       @course = Course.find(params[:course_id], :lock => 'FOR SHARE')
-      authorize! :read, @course
+      authorize! :read_course, @course
     else
       respond_access_denied
     end
@@ -258,9 +259,9 @@ private
     paste_visibility = @course.paste_visibility || "open"
     case paste_visibility
     when "protected"
-      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or (@submission.public? and @submission.exercise.completed_by?(current_user))
+      respond_access_denied unless can?(:view_expired_pastes, @submission.course) or @submission.user_id.to_s == current_user.id.to_s or (@submission.public? and @submission.exercise.completed_by?(current_user))
     else
-      respond_access_denied unless current_user.administrator? or @submission.user_id.to_s == current_user.id.to_s or ( @submission.public? and @submission.created_at > 2.hours.ago )
+      respond_access_denied unless can?(:view_expired_pastes, @submission.course) or @submission.user_id.to_s == current_user.id.to_s or ( @submission.public? and @submission.created_at > 2.hours.ago )
     end
   end
 end

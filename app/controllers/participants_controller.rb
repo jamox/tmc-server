@@ -4,7 +4,7 @@ class ParticipantsController < ApplicationController
   skip_authorization_check
   before_filter :check_access
 
-  add_breadcrumb 'Participants', :participants_path, :only => [:index, :show], :if => lambda { current_user.administrator? }
+  add_breadcrumb 'Participants', :participants_path, :only => [:index, :show], :if => lambda { can? :list_all_participants }
 
   def index
     @ordinary_fields = ['username', 'email']
@@ -52,7 +52,7 @@ class ParticipantsController < ApplicationController
     @user = User.find(params[:id])
     @awarded_points = Hash[@user.awarded_points.to_a.sort!.group_by(&:course_id).map {|k, v| [k, v.map(&:name)]}]
 
-    if current_user.administrator?
+    if can? :list_all_participants
       add_breadcrumb @user.username, participant_path(@user)
     else
       add_breadcrumb 'My stats', participant_path(@user)
@@ -79,7 +79,7 @@ class ParticipantsController < ApplicationController
     @submissions = @user.submissions.order('id DESC').includes(:user)
     Submission.eager_load_exercises(@submissions)
   end
-  
+
   def destroy
     user = User.find(params[:id])
     user.destroy
@@ -89,7 +89,7 @@ class ParticipantsController < ApplicationController
 
 private
   def check_access
-    respond_access_denied unless current_user.administrator? || params[:id] == current_user.id.to_s
+    respond_access_denied unless can? :list_all_participants || params[:id] == current_user.id.to_s
   end
 
   def index_json_data

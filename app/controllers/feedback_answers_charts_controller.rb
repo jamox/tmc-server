@@ -1,7 +1,7 @@
 class FeedbackAnswersChartsController < ApplicationController
   def show
     @course = Course.find(params[:course_id])
-    authorize! :read, @course
+    authorize! :read_course, @course
 
     add_course_breadcrumb
     add_breadcrumb 'Feedback', course_feedback_answers_path(@course)

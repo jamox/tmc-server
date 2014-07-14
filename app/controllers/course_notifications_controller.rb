@@ -41,6 +41,7 @@ class CourseNotificationsController < ApplicationController
 
 private
   def auth
+    # TODO ignore for noe
     authorize! :email, CourseNotification
   end
 end

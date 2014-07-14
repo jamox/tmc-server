@@ -3,8 +3,8 @@ class ExercisesController < ApplicationController
   def show
     @exercise = Exercise.find(params[:id])
     @course = Course.find(@exercise.course_id, :lock => 'FOR SHARE')
-    authorize! :read, @course
-    authorize! :read, @exercise
+    authorize! :read_course, @course
+    authorize! :read_exercise, @exercise
 
     respond_to do |format|
       format.html do

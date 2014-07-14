@@ -24,7 +24,7 @@ class PointsController < ApplicationController
   end
 
   def refresh_gdocs
-    authorize! :refresh, @course
+    authorize! :refresh_course, @course
     @sheetname = params[:id]
     @course = Course.find(params[:course_id])
     @notifications = @course.refresh_gdocs_worksheet @sheetname
@@ -69,14 +69,14 @@ class PointsController < ApplicationController
         per_user_and_sheet[username][sheet] = count
       end
     end
-    
+
     user_totals = {}
     for username, per_sheet in per_user_and_sheet
       user_totals[username] ||= 0
       user_totals[username] += per_sheet.values.reduce(0, &:+)
     end
 
-    include_admins = current_user.administrator?
+    include_admins = can? :show_administrators_in_points_list, course
     users = User.select('login, id, administrator').where(:login => per_user_and_sheet.keys.sort_by(&:downcase)).order('login ASC')
     users = users.where(:administrator => false) unless include_admins
 
@@ -93,7 +93,7 @@ class PointsController < ApplicationController
       :users => users
     }
   end
-  
+
   def sort_summary(summary, sorting)
     if sorting == 'total_points'
       summary[:users] = summary[:users].sort_by {|user| [-summary[:total_for_user][user.login].to_i, user.login] }

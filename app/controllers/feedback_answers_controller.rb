@@ -30,6 +30,7 @@ class FeedbackAnswersController < ApplicationController
 
     respond_to do |format|
       format.html do
+        # TODO wtf t'' eka on kun se voi olla Submission tai Exericise -> pit'nee tehd' iffi ja tarkistaa :read_exercise tai :read_course
         authorize! :read, @parent
         authorize! :read_feedback_questions, @parent
         authorize! :read_feedback_answers, @parent
@@ -44,6 +45,7 @@ class FeedbackAnswersController < ApplicationController
           all
       end
       format.json do
+        # TODO wtf t'' eka on kun se voi olla Submission tai Exericise -> pit'nee tehd' iffi ja tarkistaa :read_exercise tai :read_course
         authorize! :read, @parent
         # We only deliver public statistics so no authorization required
 
@@ -74,7 +76,7 @@ class FeedbackAnswersController < ApplicationController
 
   def show
     @answer = FeedbackAnswer.find(params[:id])
-    authorize! :read, @answer
+    authorize! :read_feedback_answers, @answer
     @course = @answer.course
     @exercise = @answer.exercise
   end
@@ -82,7 +84,7 @@ class FeedbackAnswersController < ApplicationController
   # Create multiple answers at once
   def create
     submission = Submission.find(params[:submission_id])
-    authorize! :read, submission
+    authorize! :read_submission, submission
 
     answer_params = params[:answers]
     answer_params = answer_params.values if answer_params.respond_to?(:values)
@@ -96,7 +98,7 @@ class FeedbackAnswersController < ApplicationController
         :answer => answer_hash[:answer]
       })
     end
-    answer_records.each {|record| authorize! :create, record }
+    answer_records.each {|record| authorize! :create_feedback_answer, record }
 
     begin
       ActiveRecord::Base.connection.transaction(:requires_new => true) do
