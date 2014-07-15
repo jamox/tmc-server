@@ -40,7 +40,7 @@
                 <li>
                   <%= link_to 'Sign out', signout_path, :method => :delete, :id => 'logout-link' %>
                 </li>
-              <% elsif can? :create, User %>
+              <% elsif can? :create_user, User %>
                 <li>
                   <%= link_to 'Sign up', new_user_path %>
                 </li>

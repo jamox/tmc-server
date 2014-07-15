@@ -1,5 +1,5 @@
 
-<% if can? :read, :code_reviews %>
+<% if can? :read_code_reviews, Course %>
   <h1>Code reviews for <%= @course.name %></h1>
   <section>
     <h2>Administration</h2>

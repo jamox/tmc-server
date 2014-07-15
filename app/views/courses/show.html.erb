@@ -9,11 +9,11 @@
 
       <ul>
         <li><%= link_to 'View points', course_points_path(@course) %></li>
-        <% if can? :view_code_reviews, @course %>
+        <% if can? :read_code_reviews, @course %>
           <li><%= link_to 'View code reviews', course_reviews_path(@course) %></li>
         <% end %>
       </ul>
-      <% if can? :read, :course_information %>
+      <% if can? :read_course_information, @course %>
         <ul>
           <li>Source type: <%= @course.source_backend.upcase %> </li>
           <li>Source URL: <span class="source-url"><%= @course.source_url %></span></li>
@@ -59,6 +59,7 @@
             </li>
           <% end %>
           <li>
+          <!-- TODO different permission for this? or shoud we just deprecate tis due to bad imolementation and it not really used -->
             <%= link_to 'Send message to every participant', new_course_course_notifications_path(@course) %>
           </li>
         </ul>
@@ -84,7 +85,7 @@
               <% end %>
           </ul>
         <% end %>
-        <% if can? :view_all_feedback_answers, @course %>
+        <% if can? :read_feedback_answers, @course %>
           <ul>
             <li><%= link_to 'View feedback', course_feedback_answers_path(@course)%></li>
             <% if can? :manage_feedback_answers, @course %>
@@ -93,7 +94,7 @@
           </ul>
         <% end %>
       <% end %>
-      <% if can? :refresh, @course %>
+      <% if can? :refresh_course, @course %>
         <%= link_to 'Refresh', refresh_course_path(@course), class: "btn btn-warning btn-mini" %>
       <% end %>
       <% unlockables = @course.unlockable_exercises_for(current_user) %>

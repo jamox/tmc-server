@@ -1,12 +1,13 @@
 <h1>Welcome to TMC</h1>
 
-<% if can? :view, :participants_list %>
+<% if can? :view_participants_list, :global_list %>
   <%= link_to 'List of registered users', participants_path %>
 <% end %>
 
 <h2>Courses</h2>
 
 
+<!-- TODO move to abilities-->
 <% if current_user.administrator? && !@expired_courses.empty? %>
   <h3>Ongoing courses</h3>
 <% end %>
@@ -16,6 +17,7 @@
   </div>
 </div>
 
+<!-- TODO move to abilities-->
 <% if current_user.administrator? && !@expired_courses.empty? %>
   <h3>Expired courses</h3>
   <div class="row-fluid">
@@ -25,7 +27,7 @@
   </div>
 <% end %>
 
-<% if can? :create, Course %>
+<% if can? :create_course, Course %>
   <div class="row-fluid">
     <div class="span12">
       <%= link_to 'Create New Course', new_course_path, class: "btn btn-mini btn-warning" %>

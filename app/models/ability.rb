@@ -9,9 +9,8 @@ class Ability
     if user.administrator?
       can :manage, :all
       can :create_course, Course
-      can :refresh, Course
       can :refresh_course, Course
-      can :view, :participants_list
+      can :view_participants_list, :global_list # duplicate
       can :rerun_submission, Submission
       can :refresh_gdocs_spreadsheet, Course do |c|
         !c.spreadsheet_key.blank?
@@ -43,10 +42,11 @@ class Ability
       can :create_feedback_questions
       can :update_feedback_questions, FeedbackQuestions
       can :delete_feedback_questions, FeedbackQuestion
-      can :list_all_participants
+      can :list_all_participants # duplicate?
       can :show_administrators_in_points_list, Course
       can :show_administrators_in_points_list, Course
       can :list_reviewd_submissions, Course
+      can :rerun_submission, Submission
 
       can :delete_review, Review
 
@@ -90,9 +90,9 @@ class Ability
         Permission.check!(user, c, :show_administrators_in_points_list)
       end
 
-      # TODO pit'sk; t'' muutenkin sallia, koska kai ne jotain kursseja saa n'hd' :D
+      # TODO we need to rethink this
       can :read_course, Course do |c|
-        Permission.check!(user, c, :read_course)
+        true #Permission.check!(user, c, :read_course)
       end
 
       can :view_participants_list, Course do ||
@@ -150,15 +150,11 @@ class Ability
         c.visible_to?(user)
       end
 
+      can :refresh_gdocs_spreadsheet, Course do |c|
+        Permission.check!(user, c, :refresh_gdocs_spreadsheet) &&  !c.spreadsheet_key.blank?
+      end
       can :list_all_submissions, Course do |c|
         Permission.check!(user, c, :list_all_submissions)
-      end
-
-
-
-      # TODO remove, korvaa: read_feedback_answers
-      can :view_all_feedback_answers, Course do |c|
-        raise "muuta"
       end
 
       # TODO remove
@@ -178,12 +174,9 @@ class Ability
         ex.visible_to?(user)
       end
 
-      can :read_exercise, Course do |c|
-        Permission.check!(user, c, :read_exercise)
-      en_feedback_answerd
-
+      # TODO: we need to rethink this - you must be able to view exercises relevant to you
       can :read_exercise, Exercise do |e|
-        Permission.check!(user, e.course, :read_exercise)
+        true #Permission.check!(user, e.course, :read_exercise)
       end
 
       # TODO remove
@@ -245,17 +238,11 @@ class Ability
       can :read_code_reviews, Course do |c|
         c.submissions.exists?(:user_id => user.id, :reviewed => true) || Permission.check!(user, c, :read_code_reviews)
       end
-      # TODO poista viitteet
-      cannot :read, :code_reviews
 
-      #can :read_code_reviews, Course do |c|
-      #  Permission.check!(user, c, :read_code_reviews)
-      #end
-
-      can :create_feedback_questions, FeedbackQuestions do |f|
+      can :create_feedback_questions, FeedbackQuestion do |f|
         Permission.check!(user, f.course, :create_feedback_questions)
       end
-      can :update_feedback_questions, FeedbackQuestions do |f|
+      can :update_feedback_questions, FeedbackQuestion do |f|
         Permission.check!(user, f.course, :update_feedback_questions)
       end
 

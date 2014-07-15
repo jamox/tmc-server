@@ -6,7 +6,7 @@
 
 <div class="row-fluid">
   <div class="span12">
-    <% if !@new_review && can?(:create, Review) %>
+    <% if !@new_review && can?(:create_code_reviews, @submission.course) %>
       <p><%= link_to 'Open review editor', new_submission_review_path(@submission) %></p>
     <% end %>
 
@@ -57,10 +57,10 @@
         <% end %>
         <div class="review-body"><%= simple_format(review.review_body) %></div>
         <div class="buttons">
-          <% if action_name == 'new' && can?(:update, review) %>
+          <% if action_name == 'new' && can?(:update_review, review) %>
             <button class="edit-review btn btn-warning"><span class="icon-pencil"></span>&nbsp;Edit</button>
           <% end %>
-          <% if action_name == 'new' && can?(:delete, review) %>
+          <% if action_name == 'new' && can?(:delete_review, review) %>
             <button class="delete-review btn btn-danger"><span class="icon-remove"></span>&nbsp;Delete</button>
             <div class="ui-helper-hidden">
               <%= link_to 'Delete', review_path(review), :method => :delete, :class => 'dangerous', :confirm => "Really delete this review?\nAny points will not be redacted." %>

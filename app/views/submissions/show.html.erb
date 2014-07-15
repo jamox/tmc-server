@@ -5,7 +5,7 @@
   <%= render 'pretest_error' %>
 <% end %>
 
-<% if can? :update, @submission %>
+<% if can? :rerun_submission, @submission %>
   <div class="row-fluid">
     <div class="span11">
       <h2>Rerun submission</h2>

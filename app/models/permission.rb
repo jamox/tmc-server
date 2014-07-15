@@ -54,7 +54,9 @@ class Permission < ActiveRecord::Base
 
   def self.check!(user, course, type)
     type = type.to_sym unless type === Symbol
-    users_permissions_for_course = Permission.where(user_id: user,course_id: course).first.permissions.split(",").map(&:to_sym)
+    permission = Permission.where(user_id: user,course_id: course).first
+    return false if permission.nil?
+    users_permissions_for_course = permission.permissions.split(",").map(&:to_sym)
 
     permission_in_permission_chain?(requested_permission, users_permissions_for_course)
   end
@@ -112,7 +114,7 @@ class Permission < ActiveRecord::Base
   end
 
   def self.transpose
-    @@transpose ||=
+    @transpose ||=
       PERMISSION_IMPLICATION_MAP.each_with_object({}) do |(k,v), acc|
       v.each_with_object(acc) do |k1, acc1|
         acc1[k1] ||= []
