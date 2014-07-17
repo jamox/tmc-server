@@ -31,7 +31,13 @@ class FeedbackAnswersController < ApplicationController
     respond_to do |format|
       format.html do
         # TODO wtf t'' eka on kun se voi olla Submission tai Exericise -> pit'nee tehd' iffi ja tarkistaa :read_exercise tai :read_course
-        authorize! :read, @parent
+        if @parent.class == Course
+          authorize! :read_course, @parent
+        elsif @parent.class == Submission
+          authorize! :read_submission, @parent
+        else
+          return respond_access_denied("We should not be here")
+        end
         authorize! :read_feedback_questions, @parent
         authorize! :read_feedback_answers, @parent
 

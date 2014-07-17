@@ -46,6 +46,7 @@ class ReviewsController < ApplicationController
     @show_page_presence = true
 
     @course = @submission.course
+    authorize! :read_course, @course
     add_course_breadcrumb
     add_exercise_breadcrumb
     add_submission_breadcrumb
@@ -204,7 +205,7 @@ private
     end
     if stuff.include? :review
       @review = Review.find(params[:id])
-      authorize! :read_code_reviews, @review
+      authorize! :read_code_reviews, @review.submission.course
     end
     if stuff.include? :files
       @files = SourceFileList.for_submission(@submission)

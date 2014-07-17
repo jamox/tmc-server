@@ -13,7 +13,7 @@ class Solution
   end
 
   def visible_to?(user)
-    if user.administrator?
+    if Permission.check!(user, @exercise.course, :read_solutions)
       true
     elsif user.guest?
       false

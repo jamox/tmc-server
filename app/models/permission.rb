@@ -16,7 +16,6 @@ class Permission < ActiveRecord::Base
       :delete_review,
       :dismiss_review,
       :list_all_participants, #cannot be given to individual users, only admins
-      :list_reviewd_submissions,
       :list_user_emails,
       :manage_feedback_answers,
       :manage_permissions, # cannot be givrn to apprentice as no context, well easily - TODO
@@ -29,40 +28,42 @@ class Permission < ActiveRecord::Base
       :update_feedback_questions
     ],
     apprentice: [
-      :create_code_reviews,
-      :create_submission,
-      :download_exercise,
-      :list_all_submissions,
-      :read_code_reviews,
-      :read_course,
-      :read_exercise,
-      :read_feedback_answers,  # TODO WTF, whe not use manage_feedback_questions
-      :read_feedback_questions,
-      :read_solutions,
-      :read_submission,
-      :update_review,
-      :view_expired_pastes,
+      :create_code_reviews, #ok
+      :create_submission_after_deadline, # not yet implemented (i think)
+      :download_exercise, # not yet implemented
+      :list_all_submissions, #ok
+      :list_reviewd_submissions, #ok
+      :read_code_reviews, #ok . vaaditaan jotta toisen kirjoittaman code reviewn voi nähdä
+      :read_course, #ok
+      :read_exercise, #ok
+      :read_feedback_answers, # ok
+      :read_feedback_questions, # ok, is really dependent to read_feedback_answers
+      :read_solutions, #ok
+      :read_submission, #ok
+      :update_review, #ok
+      :view_expired_pastes, # TODO not yet implemented
       # :view_participant_details # TODO maybe we should implement this
-      :view_participants_list
+      :view_participants_list # TODO not yet implemented
     ],
     student: [
       :create_feedback_answer,  #permission always for own submissions
+      :create_submission, # for open courses, not enforced yet
       :mark_as_read, # Always for own reviews
       :mark_as_unread # Always for own reviews
     ]
   }.freeze
 
-  def self.check!(user, course, type)
-    type = type.to_sym unless type === Symbol
+  def self.check!(user, course, requested_permission)
+    requested_permission = requested_permission.to_sym unless requested_permission === Symbol
     permission = Permission.where(user_id: user,course_id: course).first
     return false if permission.nil?
     users_permissions_for_course = permission.permissions.split(",").map(&:to_sym)
 
-    permission_in_permission_chain?(requested_permission, users_permissions_for_course)
+    result = permission_in_permission_chain?(requested_permission, users_permissions_for_course)
   end
 
   def self.add_permission(user, course, permission_type)
-    permission = Permission.where(user: user.id, course: course.id).first
+    permission = Permission.where(user_id: user.id, course_id: course.id).first
     if permission
       perms = permission.permissions.split(",").sort.map(&:to_sym)
       perms << permission_type
@@ -70,13 +71,13 @@ class Permission < ActiveRecord::Base
       permission.permissions = perms.join(",")
       permission.save!
     else
-      permission = Permission.create!(user: user, course: course, permission: permission_type)
+      permission = Permission.create!(user_id: user.id, course_id: course.id, permissions: permission_type)
     end
     permission
   end
 
   def self.remove_permission(user, course, permission_type)
-    permission = Permission.where(user: user.id, course: course.id).first
+    permission = Permission.where(user: user, course: course).first
     if permission
       perms = permission.permissions.split(",").sort.uniq
       perms.delete  permission_type
@@ -87,9 +88,12 @@ class Permission < ActiveRecord::Base
   end
 
   def self.permission_in_permission_chain?(requested_permission, users_permissions_for_course)
+    return_value = false
     self.find_path(requested_permission) do |permission|
-      users_permissions_for_course.include? permission
+      value = users_permissions_for_course.include? permission
+      return_value = permission if value
     end
+    return_value
   end
 
   private
@@ -105,10 +109,12 @@ class Permission < ActiveRecord::Base
 
   def self.find_path(start, visited = [], &is_destination)
     start = start.to_sym if start === Symbol
-    return start if is_destination.call(start)
-    possible_permissions = self.transpose[start]
+    res = is_destination.call(start)
+    return res if res
+    possible_permissions = self.transpose[start] || []
     (possible_permissions - visited).each do |perm|
       result = find_path(perm, visited << start, &is_destination)
+      p RESULT: result
       return result if result
     end
   end

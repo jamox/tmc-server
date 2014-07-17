@@ -29,9 +29,11 @@ class Ability
       can :download_exercise, Course
       can :list_all_submissions, Course
       can :read_submission, Course
+      can :read_submission, Submission
       can :read_exercise, Course
       can :read_exercise, Exercise
       can :read_feedback_answers, Course
+      can :read_feedback_answers, Submission
       can :read_feedback_questions, Course
       can :update_review, Review
       can :view_participants_list, Course
@@ -40,7 +42,7 @@ class Ability
       can :read_course, Course
       can :list_user_emails
       can :create_feedback_questions
-      can :update_feedback_questions, FeedbackQuestions
+      can :update_feedback_questions, FeedbackQuestion
       can :delete_feedback_questions, FeedbackQuestion
       can :list_all_participants # duplicate?
       can :show_administrators_in_points_list, Course
@@ -135,7 +137,7 @@ class Ability
       # TODO poista viitteet
       cannot :read, :course_information
 
-      can:read_course_information, Course do |c|
+      can :read_course_information, Course do |c|
         Permission.check!(user, c, :read_course_information)
       end
 
@@ -164,7 +166,7 @@ class Ability
 
       # Non admin cannot edit other users reviews
       can :update_review, Review do |r|
-        Permission.check!(user, r.submission.course) && r.reviewer_id == user.id
+        Permission.check!(user, r.submission.course, :update_review) && r.reviewer_id == user.id
       end
 
       cannot :read, Exercise
@@ -198,15 +200,18 @@ class Ability
         Permission.check!(user, c, :read_submission)
       end
 
+      can :read_submission, Submission do |s|
+        Permission.check!(user, s.course, :read_submission)
+      end
+
       can :create, Submission do |sub|
         sub.exercise.submittable_by?(user)
       end
+
       can :create_submission, Submission do |s|
         sub.exercise.submittable_by?(user) || Permission.check!(user, s.course, :create_submission)
       end
 
-      # TODO remove
-      cannot :read, FeedbackAnswer
       # TODO remove
       can :create_feedback_answer, FeedbackAnswer do |ans|
         ans.submission.user_id == user.id
@@ -219,10 +224,8 @@ class Ability
         sol.visible_to?(user)
       end
 
-      # TODO rename (pluralized)
       can :read_solutions, Solution do |s|
-        # TODO, how to find out course!!!!
-        sol.visible_to?(user) || Permission.check!(user, s, :read_solutions)
+        s.visible_to?(user) || Permission.check!(user, s.exercise.course, :read_solutions)
       end
 
       cannot :mark_as_read, Review
