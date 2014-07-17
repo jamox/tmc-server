@@ -7,7 +7,7 @@ class PositionsController < ApplicationController
   def update
     if params[:feedback_question_id]
       record =  FeedbackQuestion.find(params[:feedback_question_id])
-      authorize! :reorder_feedback_questions, record
+      authorize! :reorder_feedback_questions, record.course
       redirect_dest = course_feedback_questions_path(record.course)
     else
       return respond_not_found("Unknown resource to move")

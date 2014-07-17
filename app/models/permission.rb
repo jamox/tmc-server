@@ -9,23 +9,23 @@ class Permission < ActiveRecord::Base
 
   PERMISSION_IMPLICATION_MAP = {
     admin: [
-      :apprentice,
-      :create_course,  # cannot be given to apprentice as no context i.e. course cannot be given - or course should be nil
-      :create_feedback_questions,
-      :delete_feedback_questions,
-      :delete_review,
-      :dismiss_review,
+      :apprentice, #okish
+      :create_course, # Vithin context of course, this canoot be useed for non admin users
+      :create_feedback_questions, # ok
+      :delete_feedback_questions, # ok
+      :delete_review, # TODO
+      :dismiss_review, # TODO
       :list_all_participants, #cannot be given to individual users, only admins
-      :list_user_emails,
-      :manage_feedback_answers,
-      :manage_permissions, # cannot be givrn to apprentice as no context, well easily - TODO
-      :read_vm_log,
-      :refresh_course,
-      :reorder_feedback_questions,
-      :reply_feedback_answer, # we dont really use this yet
-      :rerun_submission,
-      :show_administrators_in_points_list,
-      :update_feedback_questions
+      :list_user_emails, # TODO
+      :manage_feedback_questions, # TODO
+      :manage_permissions, # TODO # cannot be givrn to apprentice as no context, well easily - TODO
+      :read_vm_log, # TODO
+      :refresh_course, # TODO
+      :reorder_feedback_questions, # TODO
+      :reply_feedback_answer, # TODO # we dont really use this yet
+      :rerun_submission, # TODO
+      :show_administrators_in_points_list, # TODO
+      :update_feedback_questions # ok
     ],
     apprentice: [
       :create_code_reviews, #ok

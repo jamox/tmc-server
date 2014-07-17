@@ -88,7 +88,7 @@
         <% if can? :read_feedback_answers, @course %>
           <ul>
             <li><%= link_to 'View feedback', course_feedback_answers_path(@course)%></li>
-            <% if can? :manage_feedback_answers, @course %>
+            <% if can? :manage_feedback_questions, @course %>
                 <li><%= link_to 'Manage feedback questions', course_feedback_questions_path(@course) %></li>
             <% end %>
           </ul>

@@ -3,14 +3,14 @@
 #
 # TODO: While this is nice, I think feedback questions should live in a conf file in the repo so that the entire course is defined by the repo.
 class FeedbackQuestionsController < ApplicationController
-  before_filter :get_course
+  before_filter :get_course, except: [:show, :update, :destroy]
 
   def index
     add_course_breadcrumb
     add_breadcrumb 'Feedback questions'
 
     @questions = @course.feedback_questions.order(:position)
-    authorize! :read_feedback_questions, @questions
+    authorize! :read_feedback_questions, @course
   end
 
   def new
@@ -37,7 +37,7 @@ class FeedbackQuestionsController < ApplicationController
   def show
     @question = FeedbackQuestion.find(params[:id])
     @course = @question.course
-    authorize! :read_question,  @question
+    authorize! :read_feedback_questions, @course
     authorize! :read_course,  @course
   end
 

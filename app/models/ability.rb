@@ -24,7 +24,7 @@ class Ability
       can :manage_permissions, Course
       can :list_all_submissios, Course
       can :create_code_reviews, Course
-      can :manage_feedback_answers, Course
+      can :manage_feedback_questions, Course
       can :create_submission, Course
       can :download_exercise, Course
       can :list_all_submissions, Course
@@ -53,6 +53,7 @@ class Ability
       can :delete_review, Review
 
       can :list_reviewd_submissions, Course
+      can :reorder_feedback_questions, Course
     else
       can :read, :all
 
@@ -117,12 +118,16 @@ class Ability
         Permission.check!(user, c, :read_feedback_questions)
       end
 
+      can :reorder_feedback_questions, Course do |c|
+        Permission.check!(user, c, :reorder_feedback_questions)
+      end
+
       can :read_feedback_questions, Submission do |s|
         Permission.check!(user, s, :read_feedback_questions)
       end
 
-      can :manage_feedback_answers, Course do |c|
-        Permission.check!(user, c, :manage_feedback_answers)
+      can :manage_feedback_questions, Course do |c|
+        Permission.check!(user, c, :manage_feedback_questions)
       end
 
       can :read_feedback_answers, Submission do |s|

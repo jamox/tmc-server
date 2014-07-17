@@ -3,9 +3,10 @@ class IntroducePermissionsForUsersToManageCourses < ActiveRecord::Migration
     create_table :permissions do |t|
       t.references :user
       t.references :course
-      t.string :permissions, array: true
+      t.text :permissions
 
       t.timestamps
     end
+    add_index :permissions, [:user_id, :course_id], :unique => true
   end
 end
