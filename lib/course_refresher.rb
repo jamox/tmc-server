@@ -9,6 +9,7 @@ require 'course_refresher/exercise_file_filter'
 require 'maven_cache_seeder'
 require 'set'
 require 'fileutils'
+require 'yaml'
 
 # Safely refreshes a course from a git repository
 # TODO: split this into submodules
@@ -258,6 +259,8 @@ private
         case exercise_type
           when :makefile_c
             point_names += get_c_exercise_points(exercise)
+          when :xml
+            point_names += get_xml_exercise_points(exercise)
           else
             point_names += test_case_methods(exercise).map{|x| x[:points]}.flatten
         end
@@ -312,11 +315,26 @@ private
       end
     end
 
+    def get_xml_exercise_points(exercise)
+      full_path = File.join(@course.clone_path, exercise.relative_path)
+      hash = FileTreeHasher.hash_file_tree(full_path)
+      TestScannerCache.get_or_update(@course, exercise.name, hash) do
+        # luetaan the yml ja kaapataan pisteet siita. nice :D
+        # points Set:iin tai array jolle vaan sanotaan uniq
+
+        points_array = YAML.load_file(File.join(full_path, 'metadata.yml'))['testing']['tests'].map{ |testcase| testcase['points']}.flatten.uniq.sort
+        Set.new points_array
+      end
+    end
+
+
+
     def test_case_methods(exercise)
       path = File.join(@course.clone_path, exercise.relative_path)
       TestScanner.get_test_case_methods(@course, exercise.name, path)
     end
 
+    # TODO later
     def make_solutions
       @course.exercises.each do |e|
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
@@ -327,6 +345,7 @@ private
       end
     end
 
+    # TODO later
     def make_stubs
       @course.exercises.each do |e|
         clone_path = Pathname("#{@course.clone_path}/#{e.relative_path}")
@@ -341,6 +360,8 @@ private
     def add_shared_files_to_stub(exercise_type, stub_path)
       case exercise_type
       when :makefile_c
+        #nothing yet
+      when :xml
         #nothing yet
       when :java_simple
         FileUtils.mkdir_p(stub_path + 'lib' + 'testrunner')
