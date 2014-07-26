@@ -11,8 +11,8 @@ class ExerciseDir
     end
 
     def has_tests?
-      File.exist?("#{@path}/Checking") &&
-        !(Dir.entries("#{@path}/Checking") - ['.', '..', '.gitkeep', '.gitignore']).empty?
+      File.exist?("#{@path}/checking") &&
+        !(Dir.entries("#{@path}/checking") - ['.', '..', '.gitkeep', '.gitignore']).empty?
     end
   end
 end

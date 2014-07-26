@@ -84,7 +84,7 @@ private
       MakefileC
     elsif (path + 'src/').exist? and (path + 'test/').exist?
       JavaSimple
-    elsif (path + 'Exercise/').exist? and (path + 'Checking/').exist?
+    elsif (path + 'src/').exist? and (path + 'checking/').exist?
       Xml
     else
       nil

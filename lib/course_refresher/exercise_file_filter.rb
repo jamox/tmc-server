@@ -18,13 +18,14 @@ class CourseRefresher
 
     def initialize(project_dir)
       @project_dir = Pathname(project_dir)
+      @exercise_type = ExerciseDir.exercise_type(project_dir)
       @tmc_project_file = TmcProjectFile.for_project(@project_dir)
     end
 
     def make_stub(to_dir)
       from_dir = Pathname(@project_dir).expand_path
       to_dir = Pathname(to_dir).expand_path
-      
+
       paths = files_for_stub(from_dir)
       while_copying(from_dir, to_dir, paths) do |rel_path|
         from = from_dir + rel_path
@@ -72,7 +73,8 @@ class CourseRefresher
     def write_file(path, contents)
       File.open(path, 'wb') {|f| f.write(contents) }
     end
-    
+
+    # TOOD we should remove empty dirs
     def while_copying(from_dir, to_dir, paths, &block)
       for path in paths
         if (from_dir + path).directory?
@@ -107,12 +109,17 @@ class CourseRefresher
       end
       result.sort
     end
-    
+
     def should_include_in_stub(path)
       fn = path.basename.to_s
+      rel_path = path.to_s
+      case @exercise_type
+      when :xml
+        return false if rel_path.include? 'checking' # lets ignore solutions folder
+      end
       !(fn.include?('Hidden') || fn.start_with?('.git') || fn == 'metadata.yml' || fn == '.tmcrc')
     end
-    
+
     def should_include_in_solution(path)
       fn = path.basename.to_s
       rel_path = path.to_s
