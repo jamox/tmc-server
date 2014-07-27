@@ -31,9 +31,13 @@ if [ -f pom.xml ]; then
   PROJECT_TYPE=java_maven
 elif [ -f Makefile ]; then
   PROJECT_TYPE=makefile_c
+elif [ -d checking ]; then
+  PROJECT_TYPE=xml
 else
   PROJECT_TYPE=java_simple
 fi
+echo $PROJECT_TYPE
+
 
 JAVAC_EXE_PATH=`readlink -f \`which javac\``
 MAKE_EXE_PATH=`readlink -f \`which make\``
@@ -104,6 +108,9 @@ case $PROJECT_TYPE in
 
     CLASSPATH="$TOOLS_JAR_PATH:lib/testrunner/*:lib/*"
   ;;
+  xml)
+    echo "Nothing to compile"
+  ;;
 esac
 
 
@@ -143,6 +150,8 @@ case $PROJECT_TYPE in
     fi
 
     java -Xms${JAVA_RAM_KB}K -Xmx${JAVA_RAM_KB}K "$ERROR_MSG_LOCALE_DEF" -cp "$CLASSPATH" $DEFS "fi.helsinki.cs.tmc.testrunner.Main" $TESTS > stdout.txt 2> stderr.txt
+    cat test_output.txt
+
 
   ;;
   java_maven)
@@ -182,6 +191,9 @@ case $PROJECT_TYPE in
       ./test/test > stdout.txt 2> stderr.txt
     fi
     tmc-check-convert-results > test_output.txt
+  ;;
+  xml)
+    ruby tmc-xml-grader.rb > stdout.txt 2> stderr.txt
   ;;
 esac
 
