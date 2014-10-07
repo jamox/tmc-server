@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141006185055) do
+ActiveRecord::Schema.define(:version => 20141007201230) do
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(:version => 20141006185055) do
     t.boolean "requires_review", :default => false, :null => false
   end
 
+  add_index "available_points", ["exercise_id", "name"], :name => "index_available_points_on_exercise_id_and_name", :unique => true
   add_index "available_points", ["exercise_id"], :name => "index_available_points_on_exercise_id"
 
   create_table "awarded_points", :force => true do |t|
