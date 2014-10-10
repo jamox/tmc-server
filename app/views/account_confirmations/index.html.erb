@@ -1,0 +1,11 @@
+
+<h3>Account created, but it still needs to be confirmed before you may login</h3>
+<p>
+  You should have received email confirming your registration. Click the activation link from the email reveived or copy it and paste it to your browser.<br />
+  In case you need help, plase contat the course instructor.<br />
+  TODO(jamo) add resend link
+</p>
+
+<%= form_for @user, url: participant_account_confirmations_path(participant_id: @user.id), method: :post do |f| %>
+  <%= f.submit "Create" %>
+<% end %>

@@ -14,7 +14,10 @@ TmcServer::Application.routes.draw do
 
   resource :user
 
-  resources :participants
+  resources :participants do
+    resources :account_confirmations, only: [:index]
+    post 'account_confirmations', to: 'account_confirmations#resend'
+  end
 
   resources :emails, :only => [:index]
 
@@ -23,6 +26,8 @@ TmcServer::Application.routes.draw do
   resources :password_reset_keys
   match '/reset_password/:code' => 'password_reset_keys#show', :via => :get, :as => 'reset_password'
   match '/reset_password/:code' => 'password_reset_keys#destroy', :via => :delete
+
+  get 'account_confirmations/:key', to: 'account_confirmations#confirm'
 
   resources :courses do
     member do

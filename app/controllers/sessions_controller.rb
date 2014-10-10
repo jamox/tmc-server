@@ -15,6 +15,9 @@ class SessionsController < ApplicationController
     redirect_params = {}
     if user.nil?
       redirect_params = {:alert => "Login or password incorrect. Try again."}
+    elsif !user.activated?
+      flash[:alert] = "You haven't activated your account."
+      redirect_to participant_account_confirmations_path(user) and return
     else
       sign_in user
     end

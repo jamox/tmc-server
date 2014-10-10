@@ -11,7 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141008212356) do
+ActiveRecord::Schema.define(:version => 20141010205915) do
+
+  create_table "account_confirmation_keys", :force => true do |t|
+    t.integer  "user_id",    :null => false
+    t.text     "code",       :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "available_points", :force => true do |t|
     t.integer "exercise_id",                        :null => false
@@ -256,9 +263,12 @@ ActiveRecord::Schema.define(:version => 20141008212356) do
     t.boolean  "administrator",      :default => false, :null => false
     t.text     "email",              :default => "",    :null => false
     t.boolean  "legitimate_student", :default => true,  :null => false
+    t.boolean  "activated",          :default => false
   end
 
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true
+
+  add_foreign_key "account_confirmation_keys", "users", :name => "account_confirmation_keys_user_id_fk", :dependent => :delete
 
   add_foreign_key "available_points", "exercises", :name => "available_points_exercise_id_fk", :dependent => :delete
 

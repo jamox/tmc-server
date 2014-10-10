@@ -28,11 +28,15 @@ class UsersController < ApplicationController
     set_user_fields
 
     if @user.errors.empty? && @user.save
+      @key = AccountConfirmationKey.generate_for @user
+      AccountConfirmationMailer.confirmation_mail(@user, @key).deliver
       if @bare_layout
+        # TODO(jamo) we also need to update mssage for the bare view
         render :text => '<div class="success" style="font-size: 14pt; margin: 10pt;">User account created.</div>', :layout => true
       else
-        flash[:notice] = 'User account created. You can now log in.'
-        redirect_to root_path
+        redirect_to participant_account_confirmations_path(@user)
+        #flash[:notice] = 'User account created. You can now log in.'
+        #redirect_to root_path
       end
     else
       flash.now[:error] = 'Failed'
@@ -48,6 +52,11 @@ class UsersController < ApplicationController
     else
       @user = current_user
     end
+  end
+
+  def confirm
+    render text: params[:key]
+
   end
 
   def update
