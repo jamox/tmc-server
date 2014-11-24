@@ -224,7 +224,7 @@ PLATFORMS
 
 DEPENDENCIES
   actionpack-action_caching
-  activerecord-session_store
+  activerecord-session_store (~> 0.1.0)
   acts_as_api
   andand
   cancancan (~> 1.9.0)

@@ -20,10 +20,10 @@ gem 'acts_as_api'
 gem 'mimemagic'
 gem 'rack-cors'
 gem 'newrelic_rpm'
+gem 'activerecord-session_store', '~> 0.1.0'
 
 gem 'protected_attributes' # https://github.com/rails/protected_attributes
 gem 'actionpack-action_caching' # https://github.com/rails/actionpack-action_caching
-gem 'activerecord-session_store' # https://github.com/rails/activerecord-session_store
 gem 'rails-observers' # https://github.com/rails/rails-observers
 
 
