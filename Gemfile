@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 # An alternative when rubygems.org is down
 #source 'http://production.cf.rubygems.org/'
 
-gem 'rails', '~> 3.2.0'
+gem 'rails', '~> 4.0.0'
 
 gem 'rake'
 gem 'google-spreadsheet-ruby'
@@ -20,6 +20,13 @@ gem 'acts_as_api'
 gem 'mimemagic'
 gem 'rack-cors'
 gem 'newrelic_rpm'
+
+gem 'protected_attributes' # https://github.com/rails/protected_attributes
+gem 'actionpack-action_caching' # https://github.com/rails/actionpack-action_caching
+gem 'activerecord-session_store' # https://github.com/rails/activerecord-session_store
+gem 'rails-observers' # https://github.com/rails/rails-observers
+
+
 
 gem 'pghero'
 
