@@ -25,9 +25,10 @@ feature 'User lists own organization courses', feature: true do
     end
 
     scenario 'sees both active and retired courses' do
-      expect(page).to have_content('course_1')
-      expect(page).to have_content('course_2')
-      expect(page).to have_content('course_old')
+      puts page.html
+      expect(page).to have_content('Course 1')
+      expect(page).to have_content('Course 2')
+      expect(page).to have_content('Course_old')
       expect(page).to have_content('course_disabled')
     end
   end
