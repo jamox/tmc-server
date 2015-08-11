@@ -56,39 +56,51 @@ class AwardedPoint < ActiveRecord::Base
     User.where(id: uids)
   end
 
-  # Gets a hash of user to array of point names awarded for exercises of the given sheet
+  # Gets two hashes of user to array of point names awarded and users to array of points
+  # that were submitted late for exercises of the given sheet
   def self.per_user_in_course_with_sheet(course, sheetname)
     users = User.arel_table
     awarded_points = AwardedPoint.arel_table
+    submissions = Submission.arel_table
 
-    sql = per_user_in_course_with_sheet_query(course, sheetname)
-      .project([users[:login].as('username'), awarded_points[:name].as('name')])
-      .to_sql
+    sql = per_user_in_course_with_sheet_query(course, sheetname).project(
+      [users[:login].as('username'), awarded_points[:name].as('name'),
+       submissions[:exercise_name].as('exercise_name'),
+       awarded_points[:late].as('late')]).group(
+         users[:login], awarded_points[:name], awarded_points[:late],
+         submissions[:exercise_name]).to_sql
 
-    result = {}
+
+    in_time_points = {}
+    late_points = {}
     ActiveRecord::Base.connection.execute(sql).each do |record|
-      result[record['username']] ||= []
-      result[record['username']] << record['name']
+      in_time_points[record['username']] ||= []
+      late_points[record['username']] ||= []
+      if record['late'] == 'f'
+        in_time_points[record['username']] << record['name']
+      else
+        late_points[record['username']] << record['name']
+      end
     end
-    result.default = []
-    result
+    in_time_points.default = []
+    late_points.default = []
+    [in_time_points, late_points]
   end
 
   # Gets a hash of user to count of points awarded for exercises of the given sheet
   def self.count_per_user_in_course_with_sheet(course, sheetname)
-    users = User.arel_table
+    count_per_user_in_course_with_sheet_impl(
+      per_user_in_course_with_sheet_query(course, sheetname)
+    )
+  end
 
-    sql = per_user_in_course_with_sheet_query(course, sheetname)
-      .project([users[:login].as('username'), Arel.sql('COUNT(*)').as('count')])
-      .group(users[:login])
-      .to_sql
-
-    result = {}
-    result.default = 0
-    ActiveRecord::Base.connection.execute(sql).each do |record|
-      result[record['username']] = record['count'].to_i
-    end
-    result
+  # Gets a hash of user to count of points that were awarded for exercises of the given
+  # sheet but were late
+  def self.count_late_per_user_in_course_with_sheet(course, sheetname)
+    count_per_user_in_course_with_sheet_impl(
+      per_user_in_course_with_sheet_query(course, sheetname)
+      .where(AwardedPoint.arel_table[:late].eq(true))
+    )
   end
 
   private
@@ -102,14 +114,34 @@ class AwardedPoint < ActiveRecord::Base
     awarded_points = AwardedPoint.arel_table
     available_points = AvailablePoint.arel_table
     exercises = Exercise.arel_table
+    submissions = Submission.arel_table
 
     awarded_points
       .join(users).on(awarded_points[:user_id].eq(users[:id]))
       .join(available_points).on(available_points[:name].eq(awarded_points[:name]))
       .join(exercises).on(available_points[:exercise_id].eq(exercises[:id]))
+      .join(submissions).on(awarded_points[:submission_id].eq(submissions[:id]))
       .where(awarded_points[:course_id].eq(course.id))
       .where(awarded_points[:user_id].eq(users[:id]))
       .where(exercises[:course_id].eq(course.id))
       .where(exercises[:gdocs_sheet].eq(sheetname))
+  end
+
+  def self.count_per_user_in_course_with_sheet_impl(base_sql)
+    users = User.arel_table
+    awarded_points = AwardedPoint.arel_table
+    submissions = Submission.arel_table
+
+    sql = base_sql
+      .project([users[:login].as('username'), Arel.sql('COUNT(*)').as('count')])
+      .group(users[:login]) #TODO
+      .to_sql
+
+    result = {}
+    result.default = 0
+    ActiveRecord::Base.connection.execute(sql).each do |record|
+      result[record['username']] = record['count'].to_i
+    end
+    result
   end
 end

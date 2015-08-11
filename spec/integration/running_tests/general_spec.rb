@@ -96,6 +96,30 @@ describe RemoteSandboxForTesting, type: :request, integration: true do
     end
   end
 
+  it 'should mark the points as late if the submission was submitted after soft deadline' do
+    @exercise.soft_deadline_spec = [Date.today - 7.days].to_json
+    @exercise.save!
+    @exercise_project.solve_all
+    @setup.make_zip
+
+    RemoteSandboxForTesting.run_submission(@submission)
+
+    points = AwardedPoint.where(course_id: @course.id, user_id: @user.id)
+    expect(points.all?(&:late?)).to eq(true)
+  end
+
+  it 'should not mark the points as late if the submission was submitted before soft deadline' do
+    @exercise.soft_deadline_spec = [Date.today + 7.days].to_json
+    @exercise.save!
+    @exercise_project.solve_all
+    @setup.make_zip
+
+    RemoteSandboxForTesting.run_submission(@submission)
+
+    points = AwardedPoint.where(course_id: @course.id, user_id: @user.id)
+    expect(points.all?(&:late?)).to eq(false)
+  end
+
   it 'should include tools.jar in the classpath for ant projects' do
     make_setup 'UsingToolsJar'
     @setup.make_zip
