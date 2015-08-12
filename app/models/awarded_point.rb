@@ -133,10 +133,21 @@ class AwardedPoint < ActiveRecord::Base
     submissions = Submission.arel_table
 
     sql = base_sql
-      .project([users[:login].as('username'), Arel.sql('COUNT(*)').as('count')])
-      .group(users[:login]) #TODO
+      .project([users[:login].as('username'), awarded_points[:id].count.as('count'), submissions[:exercise_name].as('ex_name')])
+      .group(users[:login], submissions[:exercise_name], awarded_points[:name]) #TODO
       .to_sql
+    #sql = base_sql
+    #  .project([users[:login].as('username'), Arel.sql('COUNT(*)').as('count'), submissions[:exercise_name].as('ex_name')])
+    #  .group(users[:login], submissions[:exercise_name], awarded_points[:name]) #TODO
+    #  .to_sql
+    #sql = per_user_in_course_with_sheet_query(course, sheetname).project(
+    #  [users[:login].as('username'), awarded_points[:name].as('name'),
+    #   submissions[:exercise_name].as('exercise_name'),
+    #   awarded_points[:late].as('late')]).group(
+    #     users[:login], awarded_points[:name], awarded_points[:late],
+    #     submissions[:exercise_name]).to_sql
 
+    byebug
     result = {}
     result.default = 0
     ActiveRecord::Base.connection.execute(sql).each do |record|
