@@ -12,14 +12,16 @@ before_install:
   - git submodule update --init --recursive
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis"
+  - rm -rf ext/tmc-sandbox
+  - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | tar xvz -C ext/tmc-sandbox
 
 services:
   - postgresql
 
 before_script:
   - createuser -U postgres -s tmc
-
-script:
   - bundle exec rake db:reset
   - export rvmsudo_secure_path=1
-  - rvmsudo bundle exec rake spec SPEC="spec/controllers spec/models spec/helpers spec/mailers"
+
+script:
+  - rvmsudo bundle exec rake spec
