@@ -13,7 +13,7 @@ before_install:
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis"
   - rm -rf ext/tmc-sandbox
-  - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | tar xvz -C ext/
+  - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | tar xz -C ext/
 
 services:
   - postgresql
