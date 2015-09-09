@@ -14,7 +14,7 @@ before_install:
   - git config --global user.name "Travis"
   - rm -rf ext/tmc-sandbox
   - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | sudo tar xz -C ext/
-  - cd ext/tmc-sandbox/web && BUNDLE_GEMFILE=Gemfile rake ext && BUNDLE_GEMFILE=Gemfile bundle install && cd ../../../
+  - cd ext/tmc-sandbox/web && BUNDLE_GEMFILE=$(pwd)/Gemfile rake ext && BUNDLE_GEMFILE=$(pwd)/Gemfile bundle install && cd ../../../
   - cd ext/tmc-sandbox/uml && sudo ./run-test-exercise.sh && cd ../../../
 
 services:
