@@ -14,6 +14,7 @@ before_install:
   - git config --global user.name "Travis"
   - rm -rf ext/tmc-sandbox
   - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | sudo tar xz -C ext/
+  - cd ext/tmc-sandbox/uml && sudo ./run-test-exercise.sh && cd ../../../
 
 services:
   - postgresql
@@ -24,4 +25,4 @@ before_script:
   - export rvmsudo_secure_path=1
 
 script:
-  - rvmsudo bundle exec rake spec
+  - rvmsudo bundle exec rake spec SPEC="spec/integration"
