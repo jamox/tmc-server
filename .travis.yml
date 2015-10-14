@@ -27,7 +27,7 @@ before_install:
   - cd ext/tmc-sandbox/web && ls -la . && sudo sed -i 's/ tmc/ $(whoami)/' site.defaults.yml && BUNDLE_GEMFILE=$(pwd)/Gemfile bundle install && BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo rake ext && cd ../../../
   - cd ext/tmc-sandbox/uml && sudo ./run-test-exercise.sh && cd ../../../
   # tmc-check
-  - mkdir $HOME/check && git clone https://github.com/testmycode/tmc-check.git && cd tmc-check && make && make install PREFIX=$HOME/check && export PATH="$HOME/check/bin:$PATH" && cd ..
+  - mkdir $HOME/check && git clone https://github.com/testmycode/tmc-check.git && echo "loaded" && cd tmc-check && echo "making" ; make && echo "make install" ; make install PREFIX=$HOME/check && export PATH="$HOME/check/bin:$PATH" && cd ..
   - export LD_LIBRARY_PATH=$HOME/check/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
   - export C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH
   - export PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH
