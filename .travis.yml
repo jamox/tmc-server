@@ -46,6 +46,9 @@ before_install:
   - cd ext/tmc-sandbox/uml
   - sudo ./run-test-exercise.sh
   - cd ../../../
+install:
+  - echo $(pwd)
+  - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --jobs=3 --deployment
 
 services:
   - postgresql
