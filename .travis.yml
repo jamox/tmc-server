@@ -22,15 +22,16 @@ before_install:
   - git submodule update --init --recursive
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis"
+  # tmc-check
+  - mkdir $HOME/check && git clone https://github.com/testmycode/tmc-check.git && echo "loaded" && cd tmc-check && echo "making" ; make && echo "make install" ; env BUNDLE_GEMFILE=$(pwd)/Gemfile  bundle install --jobs=3 --retry=3 && env BUNDLE_GEMFILE=$(pwd)/Gemfile make install PREFIX=$HOME/check BUNDLE_GEMFILE="$(pwd)/Gemfile" && export PATH="$HOME/check/bin:$PATH" && cd ..
+  - export LD_LIBRARY_PATH=$HOME/check/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
+  - export C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH
+  - export PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH
+  # use prebuilt tmc-sandbox
   - rm -rf ext/tmc-sandbox
   - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | sudo tar xz -C ext/
   - cd ext/tmc-sandbox/web && ls -la . && sudo sed -i 's/ tmc/ $(whoami)/' site.defaults.yml && BUNDLE_GEMFILE=$(pwd)/Gemfile bundle install && BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo rake ext && cd ../../../
   - cd ext/tmc-sandbox/uml && sudo ./run-test-exercise.sh && cd ../../../
-  # tmc-check
-  - mkdir $HOME/check && git clone https://github.com/testmycode/tmc-check.git && echo "loaded" && cd tmc-check && echo "making" ; make && echo "make install" ; env BUNDLE_GEMFILE=$(pwd)/Gemfile  bundle install --jobs=3 --retry=3 && env BUNDLE_GEMFILE=$(pwd)/Gemfile make install PREFIX=$HOME/check && export PATH="$HOME/check/bin:$PATH" && cd ..
-  - export LD_LIBRARY_PATH=$HOME/check/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
-  - export C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH
-  - export PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH
 
 services:
   - postgresql
@@ -41,4 +42,5 @@ before_script:
   - export rvmsudo_secure_path=1
 
 script:
+  - rvmsudo bundle exec rake spec SPEC="spec/integration" SPEC_OPTS="--fail-fast"
   - rvmsudo bundle exec rake spec SPEC="spec/integration"
