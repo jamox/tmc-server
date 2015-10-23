@@ -18,6 +18,7 @@ addons:
 
 
 before_install:
+  - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
   - git config --global user.email "travis@example.com"
