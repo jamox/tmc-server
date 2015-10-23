@@ -40,7 +40,7 @@ before_install:
   - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | sudo tar xz -C ext/
   - cd ext/tmc-sandbox/web
   - ls -la .
-  - sudo sed -i 's/ tmc/ $(whoami)/' site.defaults.yml
+  - sudo sed -i "s/ tmc/ $(whoami)/" site.defaults.yml
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo bundle install --retry=3 --jobs=3
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo rake ext
   - cd ../../../
