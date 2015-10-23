@@ -83,7 +83,7 @@ module IntegrationTestActions
 
   def wait_until(options = {}, &block)
     options = {
-      timeout: 15,
+      timeout: 150,
       sleep_time: 0.1
     }.merge(options)
     start_time = Time.now
