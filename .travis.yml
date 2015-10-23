@@ -63,4 +63,5 @@ before_script:
 
 script:
   - rvmsudo bundle exec rake spec SPEC="spec/integration" SPEC_OPTS="--fail-fast" LD_LIBRARY_PATH=$HOME/check/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH
+  - cat ext/tmc-sandbox/web/log/*
   - rvmsudo bundle exec rake spec SPEC="spec/integration"
