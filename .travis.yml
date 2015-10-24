@@ -18,7 +18,7 @@ addons:
 before_install:
   - gem update --system
   - gem --version
-  - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
+  - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --jobs=3 --deployment
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
   - git config --global user.email "travis@example.com"
@@ -54,7 +54,7 @@ before_install:
 
 install:
   - echo $(pwd)
-  - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
+  - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --jobs=3 --deployment
   - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
 
 services:
