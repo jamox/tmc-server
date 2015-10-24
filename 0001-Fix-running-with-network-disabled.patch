@@ -1,16 +1,25 @@
-From 4aa8332a7bc4f6e9c728edf08fa4dd22c4e71b74 Mon Sep 17 00:00:00 2001
+From 1e04d55ebf6abdf21f0825d375cd710eb131669d Mon Sep 17 00:00:00 2001
 From: Jarmo Isotalo <jamo@isotalo.fi>
 Date: Sat, 24 Oct 2015 20:05:42 +0200
 Subject: [PATCH] Fix running with network disabled
 
 ---
- web/webapp.rb | 2 ++
- 1 file changed, 2 insertions(+)
+ web/webapp.rb | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/web/webapp.rb b/web/webapp.rb
-index d2627d4..4ffcb27 100755
+index d2627d4..041da0a 100755
 --- a/web/webapp.rb
 +++ b/web/webapp.rb
+@@ -104,7 +104,7 @@ private
+     end
+     Process.waitpid(start_pid)
+ 
+-    MiscUtils.poll_until(:time_limit => 15) { File.exist?(webapp_pid_file) }
++    MiscUtils.poll_until(:time_limit => 150) { File.exist?(webapp_pid_file) }
+     @webapp_pid = File.read(webapp_pid_file).strip.to_i
+     AppLog.info "Dnsmasq started as #{@webapp_pid}"
+   end
 @@ -128,6 +128,8 @@ private
            end
          end
