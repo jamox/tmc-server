@@ -17,6 +17,8 @@ addons:
 
 
 before_install:
+  - gem update --system
+  - gem --version
   - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
