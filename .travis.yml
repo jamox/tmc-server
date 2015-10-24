@@ -39,7 +39,6 @@ before_install:
   - sudo mkdir -p /home/tmc/build/tmc-sandbox/misc/squidroot
   - sudo mount --bind "$(pwd)/ext/tmc-sandbox/misc/squidroot" /home/tmc/build/tmc-sandbox/misc/squidroot
   - mount
-  - rvmsudo ./ext/tmc-sandbox/web/webapp.rb run
   # tmc-check
   - mkdir $HOME/check
   - git clone https://github.com/testmycode/tmc-check.git
@@ -55,7 +54,7 @@ before_install:
 
 install:
   - echo $(pwd)
-  - rake compile
+  - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
   - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
 
 services:
