@@ -32,9 +32,9 @@ before_install:
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo bundle install --retry=3 --jobs=3
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo rake ext
   - cd ../../../
-  - cd ext/tmc-sandbox/uml
-  - sudo ./run-test-exercise.sh
-  - cd ../../../
+    #- cd ext/tmc-sandbox/uml
+    #- sudo ./run-test-exercise.sh
+    #- cd ../../../
   - sudo patch ext/tmc-sandbox/web/webapp.rb 0001-Fix-running-with-network-disabled.patch
   - ls -laR ext/tmc-sandbox/web/
   # tmc-check
