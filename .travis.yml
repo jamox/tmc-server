@@ -18,11 +18,28 @@ addons:
 
 
 before_install:
-  - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
+  # - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis"
+  # use prebuilt tmc-sandbox
+  - rm -rf ext/tmc-sandbox
+  - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | sudo tar xz -C ext/
+  - cd ext/tmc-sandbox/web
+  - ls -la .
+  - sudo sed -i "s/ tmc/ $(whoami)/" site.defaults.yml
+  - sudo sed -i "/network:.*/ {N; s/network.*/network:\n  enabled: false/g}" site.defaults.yml
+  - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo bundle install --retry=3 --jobs=3
+  - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo rake ext
+  - cd ../../../
+  - cd ext/tmc-sandbox/uml
+  - sudo ./run-test-exercise.sh
+  - cd ../../../
+  - sudo mkdir -p /home/tmc/build/tmc-sandbox/misc/squidroot
+  - sudo mount --bind "$(pwd)/ext/tmc-sandbox/misc/squidroot" /home/tmc/build/tmc-sandbox/misc/squidroot
+  - mount
+  - rvmsudo ./ext/tmc-sandbox/web/webapp.rb run
   # tmc-check
   - mkdir $HOME/check
   - git clone https://github.com/testmycode/tmc-check.git
@@ -35,23 +52,6 @@ before_install:
   - export LD_LIBRARY_PATH=$HOME/check/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
   - export C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH
   - export PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH
-  # use prebuilt tmc-sandbox
-  - rm -rf ext/tmc-sandbox
-  - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | sudo tar xz -C ext/
-  - cd ext/tmc-sandbox/web
-  - ls -la .
-  - sudo sed -i "s/ tmc/ $(whoami)/" site.defaults.yml
-  - sudo sed -i '/network:.*/ {N; s/network.*/network:\n  enabled: false/g}' site.defaults.yml
-  - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo bundle install --retry=3 --jobs=3
-  - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo rake ext
-  - cd ../../../
-  - cd ext/tmc-sandbox/uml
-  - sudo ./run-test-exercise.sh
-  - cd ../../../
-  - sudo mkdir -p /home/tmc/build/tmc-sandbox/misc/squidroot
-  - sudo mount --bind "$(pwd)/ext/tmc-sandbox/misc/squidroot" /home/tmc/build/tmc-sandbox/misc/squidroot
-  - mount
-  - rvmsudo ./ext/tmc-sandbox/web/webapp.rb run
 
 install:
   - echo $(pwd)
