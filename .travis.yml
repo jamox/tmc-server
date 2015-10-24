@@ -54,8 +54,8 @@ before_install:
 
 install:
   - echo $(pwd)
-  - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
   - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
+  - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
 
 services:
   - postgresql
