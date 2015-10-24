@@ -19,6 +19,7 @@ before_install:
   - gem update --system
   - gem --version
   - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --jobs=3 --deployment
+  - export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=1024m"
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
   - git config --global user.email "travis@example.com"
