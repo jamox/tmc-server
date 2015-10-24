@@ -18,7 +18,6 @@ addons:
 
 
 before_install:
-  - sudo ip tuntap add dev tap_tmc0 mode tap user travis
   - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
@@ -42,6 +41,7 @@ before_install:
   - cd ext/tmc-sandbox/web
   - ls -la .
   - sudo sed -i "s/ tmc/ $(whoami)/" site.defaults.yml
+  - sudo sed -i '/network:.*/ {N; s/network.*/network:\n  enabled: false/g}' site.defaults.yml
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo bundle install --retry=3 --jobs=3
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo rake ext
   - cd ../../../
