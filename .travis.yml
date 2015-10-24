@@ -37,6 +37,7 @@ before_install:
     #- cd ../../../
   - sudo patch ext/tmc-sandbox/web/webapp.rb 0001-Fix-running-with-network-disabled.patch
   - ls -laR ext/tmc-sandbox/web/
+  - rvmsudo ext/tmc-sandbox/web/webapp.rb run
   # tmc-check
   - mkdir $HOME/check
   - git clone https://github.com/testmycode/tmc-check.git
@@ -50,7 +51,7 @@ before_install:
   - export C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH
   - export PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH
   - cd ext/tmc-comet/
-  - mvn -q install -Dmaven.test.skip=true
+  - mvn install -Dmaven.test.skip=true
   - cd ../../
 
 install:
