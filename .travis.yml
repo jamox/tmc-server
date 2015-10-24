@@ -69,7 +69,11 @@ before_script:
 
 script:
   - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile rvmsudo ext/tmc-sandbox/web/webapp.rb start
+  - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile rvmsudo ext/tmc-sandbox/web/webapp.rb status
   - sleep 20
+  - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile rvmsudo ext/tmc-sandbox/web/webapp.rb status
+  - curl 127.0.0.1:3001
+  - curl 127.0.0.1:3001/status.json
   - rvmsudo bundle exec rake spec SPEC="spec/integration" SPEC_OPTS="--fail-fast" LD_LIBRARY_PATH=$HOME/check/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
   - cat ext/tmc-sandbox/web/log/*
   - rvmsudo bundle exec rake spec SPEC="spec/integration"
