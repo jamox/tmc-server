@@ -54,21 +54,21 @@ before_install:
   ##- cd ../../
 
 install:
-  - rvmsudo ext/tmc-sandbox/web/webapp.rb run
-  - sudo cat ext/tmc-sandbox/web/log/*
-  - echo $(pwd)
-  - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
-  - BUNDLE_GEMFILE=Gemfile bundle exec rake compile --trace
+    #- echo $(pwd)
+    #- BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --deployment
+    #- BUNDLE_GEMFILE=Gemfile bundle exec rake compile --trace
 
 services:
   - postgresql
 
 before_script:
-  - createuser -U postgres -s tmc
-  - bundle exec rake db:reset
+  #- createuser -U postgres -s tmc
+  #- bundle exec rake db:reset
   - export rvmsudo_secure_path=1
 
 script:
-  - rvmsudo bundle exec rake spec SPEC="spec/integration" SPEC_OPTS="--fail-fast" LD_LIBRARY_PATH=$HOME/check/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH
-  - cat ext/tmc-sandbox/web/log/*
-  - rvmsudo bundle exec rake spec SPEC="spec/integration"
+  - rvmsudo ext/tmc-sandbox/web/webapp.rb run
+  - sudo cat ext/tmc-sandbox/web/log/*
+    #- rvmsudo bundle exec rake spec SPEC="spec/integration" SPEC_OPTS="--fail-fast" LD_LIBRARY_PATH=$HOME/check/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH C_INCLUDE_PATH=$HOME/check/include:$C_INCLUDE_PATH PKG_CONFIG_PATH=$HOME/check/lib/pkgconfig:$PKG_CONFIG_PATH
+    #- cat ext/tmc-sandbox/web/log/*
+    #- rvmsudo bundle exec rake spec SPEC="spec/integration"
