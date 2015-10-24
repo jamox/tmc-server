@@ -41,7 +41,6 @@ before_install:
   - mount
   - patch ext/tmc-sandbox/web/webapp.rb /home/tmc/tmc-server/0001-Fix-running-with-network-disabled.patch
   - ls -laR ext/tmc-sandbox/web/
-  - rvmsudo ext/tmc-sandbox/web/webapp.rb run
   # tmc-check
   - mkdir $HOME/check
   - git clone https://github.com/testmycode/tmc-check.git
