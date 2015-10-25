@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 SANDBOX=$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}")
 if [ -d sandbox-cache/$SANDBOX ]
 then
