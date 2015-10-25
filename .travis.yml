@@ -52,6 +52,8 @@ before_install:
   - cd ext/tmc-comet/
   - mvn install -q -Dmaven.test.skip=true
   - cd ../../
+  # Build submodule deps
+  - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
   # use prebuilt tmc-sandbox
   - rm -rf ext/tmc-sandbox
   - echo $(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}")
@@ -68,7 +70,6 @@ before_install:
 install:
   - echo $(pwd)
   - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --jobs=3 --deployment
-  - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
 
 services:
   - postgresql
