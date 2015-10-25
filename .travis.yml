@@ -50,7 +50,7 @@ before_install:
   - cd ../../
   # use prebuilt tmc-sandbox
   - rm -rf ext/tmc-sandbox
-  - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | sudo tar xz -C ext/
+  - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox.tar.gz | tar xz -C ext/
   - cd ext/tmc-sandbox/web
   - ls -la .
   - sudo cp ../../../.sandbox-site.travis.yml site.yml
