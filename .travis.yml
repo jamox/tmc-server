@@ -17,7 +17,7 @@ cache:
   directories:
     - vendor/bundle
     - ext/tmc-sandbox/web/vendor/bundle
-    - ext/tmc-sandbox/uml
+    - sandbox-cache
 
 git:
   submodules: false
@@ -62,9 +62,8 @@ before_install:
   # Build submodule deps
   - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
   # use prebuilt tmc-sandbox
-  - echo $(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}")
-  - wget  http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz -O sandbox.tar.gz
-  - tar xz sandbox.tar.gz -C ext/
+
+  - SANDBOX=$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}") && if [ -d sandbox-cache/$SANDBOX ] ; then ; cp sandbox-cache/$SANDBOX/{linux.uml,initrd.img,rootfs.squashfs} ext/tmc-sandbox/uml ; else ; echo $(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}") ; wget  http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz -O sandbox.tar.gz ; tar xz sandbox.tar.gz -C ext/ ; fi
     #- wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xz -C ext/
   - cd ext/tmc-sandbox/web
   - ls -la .
@@ -95,3 +94,8 @@ script:
   - curl -v 127.0.0.1:3001/status.json
   - bundle exec rake spec SPEC_OPTS="--tag $RSPEC_TAG --tag ~network -f d" LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
   - cat ext/tmc-sandbox/web/log/*
+
+
+before_cache:
+  - mkdir -p sandbox-cache && SANDBOX=$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}") && mkdir -p sandbox-cache/$SANDBOX && cp ext/tmc-sandbox/uml/{linux.uml,initrd.img,rootfs.squashfs} sandbox-cache/$SANDBOX_HOST
+
