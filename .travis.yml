@@ -60,7 +60,6 @@ before_install:
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo bundle install --retry=3 --jobs=3
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo rake ext
   - cd ../../../
-  - sudo patch ext/tmc-sandbox/web/webapp.rb 0001-Don-t-require-root-when-no-network-is-used-and-no-ro.patch
 
 install:
   - echo $(pwd)
