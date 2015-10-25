@@ -34,6 +34,7 @@ before_install:
   # So that travis can clone submodules
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
+  - echo $(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}")
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis"
   # tmc-check
@@ -55,6 +56,7 @@ before_install:
   - cd ../../
   # use prebuilt tmc-sandbox
   - rm -rf ext/tmc-sandbox
+  - echo $(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}")
   - wget -qO- http://testmycode.net/prebuild-sandbox/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | sudo tar xz -C ext/
   - sudo chown $(whoami) ext/tmc-sandbox/web/
   - cd ext/tmc-sandbox/web
