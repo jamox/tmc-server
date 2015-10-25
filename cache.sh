@@ -8,5 +8,5 @@ else
   wget  http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz -O sandbox.tar.gz
   file sandbox.tar.gz
   stat sandbox.tar.gz
-  tar xvz sandbox.tar.gz -C ext/
+  tar xvzf sandbox.tar.gz -C ext/
 fi
