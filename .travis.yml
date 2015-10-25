@@ -30,6 +30,8 @@ before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
   - echo $(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}")
+  - wget http://testmycode.net/prebuild-sandbox/sandbox-"$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}")".tar.gz
+
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis"
   # tmc-check
