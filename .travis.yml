@@ -86,5 +86,5 @@ script:
   - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile ./ext/tmc-sandbox/web/webapp.rb status
   - curl 127.0.0.1:3001
   - curl -v 127.0.0.1:3001/status.json
-  - bundle exec rake spec SPEC_OPTS="--tag $RSPEC_TAG ---tag ~network -f d" LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
+  - bundle exec rake spec SPEC_OPTS="--tag $RSPEC_TAG --tag ~network -f d" LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
   - cat ext/tmc-sandbox/web/log/*
