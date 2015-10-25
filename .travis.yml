@@ -1,7 +1,8 @@
 sudo: true
 
 env:
-  RSPEC_TAG=integration
+  - RSPEC_TAG=integration
+  - RSPEC_TAG=dummy
 
 #matrix:
 #  include:
