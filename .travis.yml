@@ -57,7 +57,7 @@ before_install:
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo bundle install --retry=3 --jobs=3
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rvmsudo rake ext
   - cd ../../../
-  - sudo patch ext/tmc-sandbox/web/webapp.rb 0001-Fix-running-with-network-disabled.patch
+  - sudo patch ext/tmc-sandbox/web/webapp.rb 0001-Don-t-require-root-when-no-network-is-used-and-no-ro.patch
 
 install:
   - echo $(pwd)
@@ -73,11 +73,11 @@ before_script:
   - export rvmsudo_secure_path=1
 
 script:
-  - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile rvmsudo ext/tmc-sandbox/web/webapp.rb start
-  - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile rvmsudo ext/tmc-sandbox/web/webapp.rb status
+  - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile ./ext/tmc-sandbox/web/webapp.rb start
+  - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile ./ext/tmc-sandbox/web/webapp.rb status
   - sleep 10
-  - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile rvmsudo ext/tmc-sandbox/web/webapp.rb status
+  - BUNDLE_GEMFILE=$(pwd)/ext/tmc-sandbox/web/Gemfile ./ext/tmc-sandbox/web/webapp.rb status
   - curl 127.0.0.1:3001
   - curl -v 127.0.0.1:3001/status.json
-  - rvmsudo bundle exec rake spec --tag $RSPEC_TAG SPEC_OPTS="-f d" LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
+  - bundle exec rake spec --tag $RSPEC_TAG SPEC_OPTS="-f d" LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH SANDBOX_HOST=127.0.0.1 SANDBOX_PORT=3001
   - cat ext/tmc-sandbox/web/log/*
