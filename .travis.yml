@@ -1,10 +1,5 @@
 sudo: true
 
-env:
-  matrix:
-    -RSPEC_TAG=integration
-    -RSPEC_TAG=~integration
-
 matrix:
   include:
     - env: RSPEC_TAG=integration
