@@ -57,7 +57,9 @@ before_install:
   - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
   # use prebuilt tmc-sandbox
   - echo $(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}")
-  - wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xz -C ext/
+  - wget  http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz -O sandbox.tar.gz
+  - tar xz sandbox.tar.gz -C ext/
+    #- wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xz -C ext/
   - cd ext/tmc-sandbox/web
   - ls -la .
   - cp ../../../.sandbox-site.travis.yml site.yml
