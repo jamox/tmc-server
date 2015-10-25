@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 
 env:
   - RSPEC_TAG=integration
@@ -13,10 +13,10 @@ language: ruby
 rvm:
   - 2.2.0
 
-cache:
-  directories:
-    - vendor/bundle
-    - sandbox-cache
+#cache:
+#  directories:
+#    - vendor/bundle
+#    - sandbox-cache
 
 git:
   submodules: false
@@ -62,8 +62,8 @@ before_install:
   - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
   # use prebuilt tmc-sandbox
 
-  - bash cache.sh
-    #- wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
+    #- bash cache.sh
+  - wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
   - cd ext/tmc-sandbox/web
   - ls -la .
   - cp ../../../.sandbox-site.travis.yml site.yml
