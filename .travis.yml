@@ -56,9 +56,8 @@ before_install:
   # Build submodule deps
   - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
   # use prebuilt tmc-sandbox
-  - rm -rf ext/tmc-sandbox
   - echo $(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}")
-  - wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | sudo tar xz -C ext/
+  - wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xz -C ext/
   - sudo chown -R $(whoami) ext/tmc-sandbox/web/
   - cd ext/tmc-sandbox/web
   - ls -la .
