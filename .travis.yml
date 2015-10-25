@@ -13,6 +13,12 @@ language: ruby
 rvm:
   - 2.2.0
 
+cache:
+  directories:
+    - vendor/bundle
+    - ext/tmc-sandbox/web/vendor/bundle
+    - ext/tmc-sandbox/uml
+
 git:
   submodules: false
 
@@ -41,7 +47,7 @@ before_install:
   - mkdir $CHECK_INSTALL_DIR
   - git clone https://github.com/testmycode/tmc-check.git
   - cd tmc-check
-  - env BUNDLE_GEMFILE=$(pwd)/Gemfile bundle install --jobs=3 --retry=3
+  - env BUNDLE_GEMFILE=$(pwd)/Gemfile bundle install --jobs=3 --retry=3 --deployment
   - env BUNDLE_GEMFILE=$(pwd)/Gemfile make
   - env BUNDLE_GEMFILE=$(pwd)/Gemfile make install PREFIX=$CHECK_INSTALL_DIR BUNDLE_GEMFILE="$(pwd)/Gemfile"
   - export PATH="$CHECK_INSTALL_DIR/bin:$PATH"
