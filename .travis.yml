@@ -37,14 +37,14 @@ before_install:
   - git config --global user.email "travis@example.com"
   - git config --global user.name "Travis"
   # tmc-check
-  - mkdir $HOME/check
   - export CHECK_INSTALL_DIR=$HOME/check
+  - mkdir $CHECK_INSTALL_DIR
   - git clone https://github.com/testmycode/tmc-check.git
   - cd tmc-check
   - env BUNDLE_GEMFILE=$(pwd)/Gemfile bundle install --jobs=3 --retry=3
   - env BUNDLE_GEMFILE=$(pwd)/Gemfile make
   - env BUNDLE_GEMFILE=$(pwd)/Gemfile make install PREFIX=$CHECK_INSTALL_DIR BUNDLE_GEMFILE="$(pwd)/Gemfile"
-  - export PATH="$HOME/check/bin:$PATH"
+  - export PATH="$CHECK_INSTALL_DIR/bin:$PATH"
   - cd ..
   - export LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
   - export C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH
