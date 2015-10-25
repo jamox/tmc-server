@@ -28,6 +28,8 @@ before_install:
   # Update to latest bundler
   - gem update --system
   - gem --version
+  - wget -qO- http://testmycode.net/travis/2.2.0-tmc-server-bundler-cache.tar.gz | tar xz
+  - ls -laR
   - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --jobs=3 --deployment
   - export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=1024m"
   # So that travis can clone submodules
