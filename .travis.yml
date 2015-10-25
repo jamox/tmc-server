@@ -16,7 +16,6 @@ rvm:
 cache:
   directories:
     - vendor/bundle
-    - ext/tmc-sandbox/web/vendor/bundle
     - sandbox-cache
 
 git:
