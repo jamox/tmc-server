@@ -1,8 +1,9 @@
 sudo: true
 
-env:
-  -RSPEC_TAG=integration
-  -RSPEC_TAG=~integration
+matrix:
+  env:
+    -RSPEC_TAG=integration
+    -RSPEC_TAG=~integration
 
 language: ruby
 rvm:
