@@ -59,8 +59,10 @@ before_install:
   # use prebuilt tmc-sandbox
   - wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
   - cd ext/tmc-sandbox/web
-  - cp ../../../.sandbox-site.travis.yml site.yml
-  - sed -i "s/ tmc/ $(whoami)/" site.yml
+
+  - sed -i "s/ tmc/ $(whoami)/" site.defaults.yml
+  - sed -i '/^network:$/{$!{N;s/^network:\n  enabled: true$/network:\n  enabled: false/;ty;P;D;:y}}' site.defaults.yml
+  - cat site.defaults.yml
   - BUNDLE_GEMFILE=$(pwd)/Gemfile bundle install --retry=3 --jobs=3
   - BUNDLE_GEMFILE=$(pwd)/Gemfile rake ext
   - cd ../../../
