@@ -13,11 +13,6 @@ language: ruby
 rvm:
   - 2.2.0
 
-#cache:
-#  directories:
-#    - vendor/bundle
-#    - sandbox-cache
-
 git:
   submodules: false
 
@@ -35,6 +30,7 @@ before_install:
   - gem --version
   - wget -qO- http://testmycode.net/travis/2.2.0-tmc-server-bundler-cache.tar.gz | tar xz
   - BUNDLE_GEMFILE=Gemfile bundle install --retry=3 --jobs=3 --deployment
+  # Reduce mavens memory usage
   - export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=1024m"
   # So that travis can clone submodules
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
@@ -54,18 +50,15 @@ before_install:
   - export LD_LIBRARY_PATH=$CHECK_INSTALL_DIR/lib:/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
   - export C_INCLUDE_PATH=$CHECK_INSTALL_DIR/include:$C_INCLUDE_PATH
   - export PKG_CONFIG_PATH=$CHECK_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
-    #tmc comet, compile manually since rake task keeps on failing in travis...
+  #tmc comet, compile manually since rake task keeps on failing in travis...
   - cd ext/tmc-comet/
   - mvn install -q -Dmaven.test.skip=true
   - cd ../../
   # Build submodule deps
   - BUNDLE_GEMFILE=Gemfile bundle exec rake compile
   # use prebuilt tmc-sandbox
-
-    #- bash cache.sh
   - wget -qO- http://testmycode.net/travis/sandbox-$(git submodule status ext/tmc-sandbox | grep -E -o  "[0-9a-f]{40}").tar.gz | tar xvz -C ext/
   - cd ext/tmc-sandbox/web
-  - ls -la .
   - cp ../../../.sandbox-site.travis.yml site.yml
   - sed -i "s/ tmc/ $(whoami)/" site.yml
   - BUNDLE_GEMFILE=$(pwd)/Gemfile bundle install --retry=3 --jobs=3
